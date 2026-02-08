@@ -1,15 +1,16 @@
 {
   "files": {
     "main.css": "/coursify-web/static/css/main.cf10be54.css",
-    "main.js": "/coursify-web/static/js/main.362f4b2a.js",
+    "main.js": "/coursify-web/static/js/main.75e8f084.js",
     "static/js/453.d9ce8be3.chunk.js": "/coursify-web/static/js/453.d9ce8be3.chunk.js",
+    "static/media/logo.png": "/coursify-web/static/media/logo.f58344dcd6a1a95752db.png",
     "index.html": "/coursify-web/index.html",
     "main.cf10be54.css.map": "/coursify-web/static/css/main.cf10be54.css.map",
-    "main.362f4b2a.js.map": "/coursify-web/static/js/main.362f4b2a.js.map",
+    "main.75e8f084.js.map": "/coursify-web/static/js/main.75e8f084.js.map",
     "453.d9ce8be3.chunk.js.map": "/coursify-web/static/js/453.d9ce8be3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.cf10be54.css",
-    "static/js/main.362f4b2a.js"
+    "static/js/main.75e8f084.js"
   ]
 }
