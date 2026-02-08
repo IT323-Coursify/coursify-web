@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Login.css";
+import logo from "./assets/logo.png";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -25,7 +26,7 @@ function Login() {
   <main className="page">
         {/* PAGE HEADER */}
         <header className="page-header">
-        <img src="/logo.png" alt="Coursify Logo" className="page-logo" />
+            <img src={logo} alt="Coursify Logo" className="page-logo" />
         </header>
 
         {/* LOGIN CARD */}
