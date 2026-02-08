@@ -57,7 +57,7 @@ function Login() {
                     <button type="submit">LOGIN</button>
 
                     <p className="signup-link">
-                    Don&apos;t have an account? <a href="/register">Click here</a>
+                    Don&apos;t have an account? <span>Click here</span>
                     </p>
 
                 </form>

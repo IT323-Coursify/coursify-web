@@ -109,13 +109,13 @@
   
 }
 
-.signup-link a {
+.signup-link span {
   color: #20AFAB;
   text-decoration: none;
   font-weight: 700;
 }
 
-.signup-link a:hover {
+.signup-link span:hover {
   text-decoration: underline;
 }
 
