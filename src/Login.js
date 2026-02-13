@@ -1,78 +1,113 @@
 import { useState } from "react";
-import "./Login.css";
-import logo from "./assets/logo.png";
+import InputField from "./components/InputField";
+import PrimaryButton from "./components/PrimaryButton";
+import logoText from "./assets/logo-text.png";
+import coursifyLogo from "./assets/coursify-logo.png";
+import "./styles/Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const user = {
-    email: "admin@smartcourse.com",
+  const users = [
+  {
+    email: "student1@coursify.com",
     password: "123456",
-  };
-
+    name: "User 1",
+  },
+  
+];
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (email === user.email && password === user.password) {
-      setMessage("Login successful! Welcome to Coursify.");
-    } else {
-      setMessage("Invalid email or password.");
-    }
-  };
+    if (!email || !password) {
+      setMessage("Please fill in all fields.");
+    return;
+  } 
+    // Find user in the array
+  const foundUser = users.find(
+    (user) => user.email === email && user.password === password
+  );
 
+  if (foundUser) {
+    setMessage(`Welcome, ${foundUser.name}! Login successful.`);
+  } else {
+    setMessage("Invalid email or password.");
+  }
+};
+  
   return (
-  <main className="page">
-        {/* PAGE HEADER */}
-        <header className="page-header">
-            <img src={logo} alt="Coursify Logo" className="page-logo" />
-        </header>
+    <main className="split-page">
 
-        {/* LOGIN CARD */}
-        <section className="login-wrapper">
-            {/* LEFT SIDE */}
-            <div className="login-left">
-                <h1>LOGIN</h1>
+      {/* LEFT SIDE */}
+      <div className="split-left">
 
-                <form onSubmit={handleSubmit} className="login-form">
-                    <label>Email Address</label>
-                    <input
-                        type="email"
-                        placeholder="yourname@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
+        {/* Logo at top-left */}
+        <div className="logo-container">
+          <img src={logoText} alt="Coursify" className="logo-text" />
+        </div>
 
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+        <div className="brand-content">
+          <h1>Know yourself. Find your path. </h1>
+          <p>Get personalized college course recommendations based on your strengths, interests, and potential!</p>
+        </div>
+      </div>
 
-                    <button type="submit">LOGIN</button>
+      {/* RIGHT SIDE - LOGIN FORM */}
+      <div className="split-right">
+        <div className="form-container">
+          {/* Logo centered */}
+          <div className="form-logo-container">
+            <img src={coursifyLogo} alt="Coursify Logo" className="form-logo" />
+          </div>
 
-                    <p className="signup-link">
-                    Don&apos;t have an account? <span>Click here</span>
-                    </p>
+          <h2>Welcome to Coursify!</h2>
+          <p>Sign in to continue using Coursify.</p>
+          <form onSubmit={handleSubmit} className="login-form">
 
-                </form>
+            <InputField
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email or Username"
+            />
 
-                {message && <p className="message">{message}</p>}
+            <InputField
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+
+            {/* Interactive Behavior 1: Toggle Password */}
+            <div className="remember-row">
+              <div className="checkbox-row">
+                <input
+                  type="checkbox"
+                  onChange={() => setShowPassword(!showPassword)}
+                />
+                <span>Show password</span>
+              </div>
+
+              <span className="forgot-link">Forgot password?</span>
             </div>
 
-            {/* RIGHT SIDE */}
-            <div className="login-right">
-                <div className="wave"></div>
-            </div>
-        </section>
-  </main>
-);
+            <PrimaryButton text="LOGIN" type="submit" />
 
+          </form>
+
+          {message && <p className="message">{message}</p>}
+
+          <p className="signup-link">
+            Don't have an account? <span>Register Here</span>
+          </p>
+
+        </div>
+      </div>
+    </main>
+  );
 }
 
 export default Login;

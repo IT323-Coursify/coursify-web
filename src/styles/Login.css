@@ -1,0 +1,155 @@
+/* Layout */
+.split-page {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* 60% LEFT */
+.split-left {
+  flex: 6;
+  background: linear-gradient(135deg, #4da3f5, #2bbbad);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 60px;
+}
+
+/* Logo container */
+.logo-container {
+  position: absolute;
+  top: 40px;
+  left: 30px;
+}
+
+/* Logo image */
+.logo-text {
+  height: 50px;
+  width: auto;
+}
+
+.brand-content h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.brand-content p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* 40% RIGHT */
+.split-right {
+  flex: 4;
+  background: #f9fafb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.form-logo {
+  height: 60px;
+  width: auto;
+}
+
+.form-container {
+  width: 300px;
+}
+
+.form-container h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+/* Input */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #6b7280;
+}
+
+.input-group input {
+  padding: 10px 0;
+  border: none;
+  border-bottom: 2px solid #d1d5db;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  border-bottom: 2px solid #6366f1;
+}
+
+/* Remember row */
+.remember-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.forgot-link {
+  color: #2bbbad;
+  cursor: pointer;
+}
+
+/* Button */
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #FBB217, #e0a045);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background: #2bbbad;
+  opacity: 0.9;
+}
+
+.message {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #fbe122;
+}
+
+.signup-link {
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.signup-link span {
+  color: #20AFAB;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
