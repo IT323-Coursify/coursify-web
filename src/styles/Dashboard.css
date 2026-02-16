@@ -1,0 +1,120 @@
+/* ===== Whole Layout ===== */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 250px;
+  background: #1e1e2f;
+  color: white;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  margin-bottom: 30px;
+  font-size: 22px;
+  color: #ffffff;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar-link {
+  background: #2c2c3e;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background: #6c63ff;
+}
+
+/* ===== Main Content ===== */
+.dashboard {
+  flex: 1;
+  padding: 50px;
+  background: #f4f6fb;
+  border-top-left-radius: 30px;
+}
+
+/* ===== Header ===== */
+.dashboard-header h2 {
+  font-size: 28px;
+  margin: 0;
+  color: #333;
+}
+
+.dashboard-header p {
+  color: #666;
+  margin-top: 5px;
+}
+
+/* ===== Recommendations Grid ===== */
+.recommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+/* ===== Course Card Style ===== */
+.course-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+}
+
+.course-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.course-reason {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.match-score {
+  font-weight: bold;
+  font-size: 15px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* Dynamic score colors */
+.high-score {
+  background: #d4edda;
+  color: #155724;
+}
+
+.medium-score {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.low-score {
+  background: #f8d7da;
+  color: #721c24;
+}

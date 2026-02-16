@@ -1,9 +1,12 @@
-import './App.css';
-import Login from './Login';
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  return <Login />;
+  return (
+    <div className="app-container">
+      <Dashboard />
+    </div>
+  );
 }
-
 
 export default App;

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import InputField from "./components/InputField";
-import PrimaryButton from "./components/PrimaryButton";
+import InputField from "../components/InputField";
+import PrimaryButton from "../components/PrimaryButton";
 import logoText from "./assets/logo-text.png";
 import coursifyLogo from "./assets/coursify-logo.png";
 import "./styles/Login.css";
