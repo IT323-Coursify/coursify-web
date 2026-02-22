@@ -1,13 +1,30 @@
+import { NavLink } from "react-router-dom";
+import logoText1 from "../assets/logo-text.png";
+
 function Sidebar() {
   return (
     <aside className="sidebar">
-      <h2>Coursify</h2>
+      <div className="logo-container">
+        <img src={logoText1} alt="Coursify" className="logo-text1" />
+      </div>
 
       <nav>
-        <button className="sidebar-link">Dashboard</button>
-        <button className="sidebar-link">Assessment</button>
-        <button className="sidebar-link">Profile</button>
-        <button className="sidebar-link">Settings</button>
+        {/* NavLink automatically applies an 'active' class when the route matches */}
+        <NavLink to="/dashboard" className="sidebar-link">
+          Dashboard
+        </NavLink>
+        
+        <NavLink to="/assessment" className="sidebar-link">
+          Assessment
+        </NavLink>
+        
+        <NavLink to="/profile" className="sidebar-link">
+          Profile
+        </NavLink>
+        
+        <NavLink to="/settings" className="sidebar-link">
+          Settings
+        </NavLink>
       </nav>
     </aside>
   );

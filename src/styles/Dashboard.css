@@ -3,50 +3,76 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+   
 }
 
 /* ===== Sidebar ===== */
 .sidebar {
   width: 250px;
-  background: #1e1e2f;
+  background: linear-gradient(135deg, #4da3f5, #2bbbad);
   color: white;
-  padding: 30px 20px;
+  padding: 30px 0;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
 }
 
-.sidebar h2 {
-  margin-bottom: 30px;
-  font-size: 22px;
-  color: #ffffff;
-}
 
 .sidebar nav {
+  margin-top: 100px;
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+/* Default state for your NavLinks */
 .sidebar-link {
-  background: #2c2c3e;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  color: white;
+  display: block;
+  padding: 15px 30px;
+  text-decoration: none;
+  color: #ffffff; 
+  font-size: 16px;
+  font-weight: 500;
+  border-left: 6px solid transparent; 
+  transition: all 0.2s ease;
+  
+  /* Reset button styles if you were previously applying them */
+  background: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  text-align: left;
+  width: 100%;
   cursor: pointer;
-  transition: 0.3s ease;
 }
 
 .sidebar-link:hover {
-  background: #6c63ff;
+  background-color: #FBB217;
+}
+
+/* The Active State (NavLink adds this class automatically!) */
+.sidebar-link.active {
+  color: #474749; 
+  border-left: 6px solid #FBB217; /* The solid pink indicator */
+  background: linear-gradient(to right, #fce4ec 0%, transparent 100%); /* The fading background */
+}
+.logo-container {
+  width: 12%;
+  text-align: center;   
+  margin-bottom: 50px;
+}
+
+.logo-text1 {
+  width: 200px;
+  margin-bottom: 30px;
+  height: auto;
 }
 
 /* ===== Main Content ===== */
 .dashboard {
   flex: 1;
   padding: 50px;
-  background: #f4f6fb;
+  background: #FFFCF3;
   border-top-left-radius: 30px;
 }
 
@@ -83,12 +109,6 @@
   transform: translateY(-5px);
 }
 
-.course-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
 .course-reason {
   color: #555;
   font-size: 14px;
@@ -117,4 +137,81 @@
 .low-score {
   background: #f8d7da;
   color: #721c24;
+}
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background-color: #e60000;
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 20px 0;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .logo-container {
+    display: none; /* hide logo on mobile sidebar */
+  }
+
+  .sidebar nav {
+    margin-top: 0;
+    flex-direction: row;
+    gap: 0;
+    width: 100%;
+  }
+
+  .sidebar-link {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-left: none;
+    border-bottom: 4px solid transparent;
+    white-space: nowrap;
+  }
+
+  .sidebar-link.active {
+    border-left: none;
+    border-bottom: 4px solid #FBB217;
+    background: linear-gradient(to top, #fce4ec 0%, transparent 100%);
+  }
+
+  .dashboard {
+    padding: 24px 16px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 0;
+  }
+
+  .dashboard-header h2 {
+    font-size: 22px;
+  }
+
+  .recommendations {
+    grid-template-columns: 1fr;
+  }
+
+  .logout-btn {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+  }
 }

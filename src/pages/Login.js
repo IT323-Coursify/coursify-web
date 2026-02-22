@@ -1,9 +1,10 @@
 import { useState } from "react";
 import InputField from "../components/InputField";
 import PrimaryButton from "../components/PrimaryButton";
-import logoText from "./assets/logo-text.png";
-import coursifyLogo from "./assets/coursify-logo.png";
-import "./styles/Login.css";
+import logoText from "../assets/logo-text.png";
+import coursifyLogo from "../assets/coursify-logo.png";
+import "../styles/Login.css";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,33 +12,37 @@ function Login() {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigate = useNavigate();
+
   const users = [
-  {
-    email: "student1@coursify.com",
-    password: "123456",
-    name: "User 1",
-  },
-  
-];
+    {
+      email: "student1@coursify.com",
+      password: "123456",
+      name: "User 1",
+    },
+
+  ];
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!email || !password) {
       setMessage("Please fill in all fields.");
-    return;
-  } 
+      return;
+    }
     // Find user in the array
-  const foundUser = users.find(
-    (user) => user.email === email && user.password === password
-  );
+    const foundUser = users.find(
+      (user) => user.email === email && user.password === password
+    );
 
-  if (foundUser) {
-    setMessage(`Welcome, ${foundUser.name}! Login successful.`);
-  } else {
-    setMessage("Invalid email or password.");
-  }
-};
-  
+    if (foundUser) {
+      setMessage(`Welcome, ${foundUser.name}! Login successful.`);
+      navigate("/dashboard");
+    } else {
+      setMessage("Invalid email or password.");
+    }
+  };
+
   return (
     <main className="split-page">
 

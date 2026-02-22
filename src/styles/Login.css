@@ -7,6 +7,7 @@
 
 /* 60% LEFT */
 .split-left {
+  position: relative;
   flex: 6;
   background: linear-gradient(135deg, #4da3f5, #2bbbad);
   display: flex;
@@ -25,8 +26,9 @@
 
 /* Logo image */
 .logo-text {
-  height: 50px;
-  width: auto;
+  width: 200px;
+  margin-bottom: 30px;
+  height: auto  ;
 }
 
 .brand-content h1 {
@@ -153,3 +155,42 @@
 }
 
 
+@media (max-width: 768px) {
+  .split-page {
+    flex-direction: column;
+  }
+
+  .split-left {
+    flex: none;
+    height: 220px;
+    padding: 30px;
+  }
+
+  .logo-container {
+    top: 20px;
+    left: 20px;
+  }
+
+  .logo-text {
+    width: 130px;
+  }
+
+  .brand-content h1 {
+    font-size: 22px;
+  }
+
+  .brand-content p {
+    font-size: 14px;
+  }
+
+  .split-right {
+    flex: 1;
+    padding: 30px 20px;
+    align-items: flex-start;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+}
