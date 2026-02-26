@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"; g
 import InputField from "../components/InputField";
 import PrimaryButton from "../components/PrimaryButton";
 import logoText from "../assets/logo-text.png";
@@ -106,7 +107,10 @@ function Login() {
           {message && <p className="message">{message}</p>}
 
           <p className="signup-link">
-            Don't have an account? <span>Register Here</span>
+            Don't have an account?{" "}
+            <Link to="/register" style={{ color: '#20AFAB', fontWeight: '600', textDecoration: 'none' }}>
+              Register Here
+            </Link>
           </p>
 
         </div>
