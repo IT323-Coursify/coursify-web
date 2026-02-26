@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AssessmentProvider } from "./context/Assessmentcontext";
 import Login from "./pages/Login";
+import Register from "./pages/Register"; // Add this import
 import Dashboard from "./pages/Dashboard";
 import Assessment from "./pages/Assessment";
 import Profile from "./pages/Profile";
@@ -13,6 +14,7 @@ function App() {
       <AssessmentProvider>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} /> {/* Add this route */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/assessment" element={<Assessment />} />
           <Route path="/profile" element={<Profile />} />
