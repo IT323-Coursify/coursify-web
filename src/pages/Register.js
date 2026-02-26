@@ -4,8 +4,8 @@ import InputField from "../components/InputField";
 import PrimaryButton from "../components/PrimaryButton";
 import logoText from "../assets/logo-text.png";
 import coursifyLogo from "../assets/coursify-logo.png";
-import "../styles/Login.css"; // Reusing the same CSS
-import "../styles/Register.css"; // Additional register-specific styles
+import "../styles/Login.css"; 
+import "../styles/Register.css"; 
 
 function Register() {
   const [fullName, setFullName] = useState("");
@@ -42,11 +42,10 @@ function Register() {
       return;
     }
 
-    // In a real app, you would send this data to your backend
-    // For now, we'll just simulate successful registration
+
     setMessage("Registration successful! Redirecting to login...");
     
-    // Redirect to login after 2 seconds
+   
     setTimeout(() => {
       navigate("/");
     }, 2000);
@@ -58,7 +57,7 @@ function Register() {
 
   return (
     <main className="split-page">
-      {/* LEFT SIDE - Same as Login page */}
+    
       <div className="split-left">
         <div className="logo-container">
           <img src={logoText} alt="Coursify" className="logo-text" />
@@ -70,10 +69,10 @@ function Register() {
         </div>
       </div>
 
-      {/* RIGHT SIDE - REGISTER FORM */}
+    
       <div className="split-right">
         <div className="form-container register-form-container">
-          {/* Logo centered */}
+         
           <div className="form-logo-container">
             <img src={coursifyLogo} alt="Coursify Logo" className="form-logo" />
           </div>
