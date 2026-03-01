@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/coursify-web/static/css/main.75ce4a63.css",
-    "main.js": "/coursify-web/static/js/main.202f81d4.js",
+    "main.css": "/coursify-web/static/css/main.381ae451.css",
+    "main.js": "/coursify-web/static/js/main.476247e1.js",
     "static/js/453.d9ce8be3.chunk.js": "/coursify-web/static/js/453.d9ce8be3.chunk.js",
     "static/media/coursify-logo.png": "/coursify-web/static/media/coursify-logo.e0d65da9adf724758c80.png",
     "static/media/logo-text.png": "/coursify-web/static/media/logo-text.d0cb9fe4306ae6926cea.png",
     "index.html": "/coursify-web/index.html",
-    "main.75ce4a63.css.map": "/coursify-web/static/css/main.75ce4a63.css.map",
-    "main.202f81d4.js.map": "/coursify-web/static/js/main.202f81d4.js.map",
+    "main.381ae451.css.map": "/coursify-web/static/css/main.381ae451.css.map",
+    "main.476247e1.js.map": "/coursify-web/static/js/main.476247e1.js.map",
     "453.d9ce8be3.chunk.js.map": "/coursify-web/static/js/453.d9ce8be3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.75ce4a63.css",
-    "static/js/main.202f81d4.js"
+    "static/css/main.381ae451.css",
+    "static/js/main.476247e1.js"
   ]
 }
