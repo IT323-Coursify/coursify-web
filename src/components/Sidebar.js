@@ -22,9 +22,6 @@ function Sidebar() {
           Profile
         </NavLink>
         
-        <NavLink to="/settings" className="sidebar-link">
-          Settings
-        </NavLink>
       </nav>
     </aside>
   );

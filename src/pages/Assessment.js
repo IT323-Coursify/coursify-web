@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 import { useAssessment } from "../context/Assessmentcontext";
 import { computeRecommendations } from "../utils/recommendationEngine";
 import "../styles/Assessment.css";
@@ -105,155 +106,178 @@ export default function Assessment() {
   return (
     <div className="dashboard-layout">
       <Sidebar />
-      <main className="dashboard">
+      <div className="dashboard-main">
+        <Header />
+        <main className="dashboard">
 
-        <div className="assessment-header">
-          <h2>Profile Assessment</h2>
-          <p>Answer honestly — your results drive your course recommendations.</p>
-        </div>
-
-        {currentStep !== "done" && (
-          <div className="progress-wrapper">
-            <div className="progress-label">Step {stepIndex + 1} of {STEPS.length - 1}</div>
-            <div className="progress-bar-track">
-              <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-            </div>
+          <div className="assessment-header">
+            <h2>Profile Assessment</h2>
+            <p>Answer honestly — your results drive your course recommendations.</p>
           </div>
-        )}
 
-        {/* STEP 1: SHS Strand */}
-        {currentStep === "strand" && (
-          <div className="step-card">
-            <h3 className="step-title">What is your SHS strand?</h3>
-            <p className="step-subtitle">Your academic track helps us understand your preparation.</p>
-            <div className="strand-grid">
-              {strandOptions.map((s) => (
-                <button
-                  key={s}
-                  className={"strand-btn" + (strand === s ? " selected" : "")}
-                  onClick={() => setStrand(s)}
-                >
-                  <span className="strand-name">{s}</span>
-                  <span className="strand-desc">{strandDesc[s]}</span>
+          {currentStep !== "done" && (
+            <div className="progress-wrapper" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemin={1} aria-valuemax={STEPS.length - 1}>
+              <div className="progress-label">Step {stepIndex + 1} of {STEPS.length - 1}</div>
+              <div className="progress-bar-track">
+                <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 1: Strand */}
+          {currentStep === "strand" && (
+            <section className="step-card">
+              <h3 className="step-title">What is your SHS strand?</h3>
+              <p className="step-subtitle">Your academic track helps us understand your preparation.</p>
+              <div className="strand-grid" role="group" aria-label="Select your SHS strand">
+                {strandOptions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={"strand-btn" + (strand === s ? " selected" : "")}
+                    aria-pressed={strand === s}
+                    onClick={() => setStrand(s)}
+                  >
+                    <span className="strand-name">{s}</span>
+                    <span className="strand-desc">{strandDesc[s]}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="step-nav">
+                <div />
+                <button type="button" className="btn-next" onClick={handleNext} disabled={!canProceed()}>
+                  Next →
                 </button>
-              ))}
-            </div>
-            <div className="step-nav">
-              <div />
-              <button className="btn-next" onClick={handleNext} disabled={!canProceed()}>Next →</button>
-            </div>
-          </div>
-        )}
+              </div>
+            </section>
+          )}
 
-        {/* STEP 2: RIASEC — 1 to 5 star rating */}
-        {currentStep === "riasec" && (
-          <div className="step-card">
-            <h3 className="step-title">RIASEC Interest Inventory</h3>
-            <p className="step-subtitle">
-              Rate how much each activity interests you — 1 (not at all) to 5 (very much).
-            </p>
-            <div className="riasec-list">
-              {riasecQuestions.map((q, i) => {
-                const current = riasecAnswers[q.id] || 0;
-                return (
-                  <div key={q.id} className="riasec-row">
-                    <span className="riasec-num">{i + 1}</span>
-                    <span className="riasec-text">{q.text}</span>
-                    <div className="rating-stars">
-                      {[1, 2, 3, 4, 5].map((val) => (
+          {/* STEP 2: RIASEC */}
+          {currentStep === "riasec" && (
+            <section className="step-card">
+              <h3 className="step-title">RIASEC Interest Inventory</h3>
+              <p className="step-subtitle">
+                Rate how much each activity interests you — 1 (not at all) to 5 (very much).
+              </p>
+              <div className="riasec-list">
+                {riasecQuestions.map((q, i) => {
+                  const current = riasecAnswers[q.id] || 0;
+                  return (
+                    <div key={q.id} className="riasec-row">
+                      <span className="riasec-num" aria-hidden="true">{i + 1}</span>
+                      <span className="riasec-text">{q.text}</span>
+                      <div className="rating-stars" role="group" aria-label={`Rating for: ${q.text}`}>
+                        {[1, 2, 3, 4, 5].map((val) => (
+                          <button
+                            key={val}
+                            type="button"
+                            className={"star-btn" + (current >= val ? " active" : "")}
+                            aria-label={`${val} star`}
+                            onClick={() => setRiasecAnswers({ ...riasecAnswers, [q.id]: val })}
+                          >★</button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="step-nav">
+                <button type="button" className="btn-back" onClick={handleBack}>← Back</button>
+                <button type="button" className="btn-next" onClick={handleNext} disabled={!canProceed()}>
+                  Next →
+                </button>
+              </div>
+            </section>
+          )}
+
+          {/* STEP 3: MBTI */}
+          {currentStep === "mbti" && (
+            <section className="step-card">
+              <h3 className="step-title">Personality Indicator (MBTI)</h3>
+              <p className="step-subtitle">Choose the option that best describes you for each pair.</p>
+              <div className="mbti-list">
+                {mbtiQuestions.map((q) => (
+                  <div key={q.dimension} className="mbti-question">
+                    <p className="mbti-q-text">{q.question}</p>
+                    <div className="mbti-options" role="group" aria-label={q.question}>
+                      {q.options.map((opt) => (
                         <button
-                          key={val}
-                          className={"star-btn" + (current >= val ? " active" : "")}
-                          onClick={() => setRiasecAnswers({ ...riasecAnswers, [q.id]: val })}
-                        >★</button>
+                          key={opt.value}
+                          type="button"
+                          className={"mbti-opt" + (mbtiAnswers[q.dimension] === opt.value ? " selected" : "")}
+                          aria-pressed={mbtiAnswers[q.dimension] === opt.value}
+                          onClick={() => setMbtiAnswers({ ...mbtiAnswers, [q.dimension]: opt.value })}
+                        >
+                          <span className="mbti-badge" aria-hidden="true">{opt.value}</span>
+                          <span className="mbti-label">{opt.label}</span>
+                        </button>
                       ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            <div className="step-nav">
-              <button className="btn-back" onClick={handleBack}>← Back</button>
-              <button className="btn-next" onClick={handleNext} disabled={!canProceed()}>Next →</button>
-            </div>
-          </div>
-        )}
+                ))}
+              </div>
+              <div className="step-nav">
+                <button type="button" className="btn-back" onClick={handleBack}>← Back</button>
+                <button type="button" className="btn-next" onClick={handleNext} disabled={!canProceed()}>
+                  Next →
+                </button>
+              </div>
+            </section>
+          )}
 
-        {/* STEP 3: MBTI */}
-        {currentStep === "mbti" && (
-          <div className="step-card">
-            <h3 className="step-title">Personality Indicator (MBTI)</h3>
-            <p className="step-subtitle">Choose the option that best describes you for each pair.</p>
-            <div className="mbti-list">
-              {mbtiQuestions.map((q) => (
-                <div key={q.dimension} className="mbti-question">
-                  <p className="mbti-q-text">{q.question}</p>
-                  <div className="mbti-options">
-                    {q.options.map((opt) => (
-                      <button
-                        key={opt.value}
-                        className={"mbti-opt" + (mbtiAnswers[q.dimension] === opt.value ? " selected" : "")}
-                        onClick={() => setMbtiAnswers({ ...mbtiAnswers, [q.dimension]: opt.value })}
-                      >
-                        <span className="mbti-badge">{opt.value}</span>
-                        <span className="mbti-label">{opt.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="step-nav">
-              <button className="btn-back" onClick={handleBack}>← Back</button>
-              <button className="btn-next" onClick={handleNext} disabled={!canProceed()}>Next →</button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 4: Academic Ratings */}
-        {currentStep === "academic" && (
-          <div className="step-card">
-            <h3 className="step-title">Academic Self-Assessment</h3>
-            <p className="step-subtitle">Rate your confidence in each subject (1 = low, 5 = high).</p>
-            <div className="ratings-list">
-              {academicSubjects.map((subject) => {
-                const current = academicRatings[subject] || 0;
-                return (
-                  <div key={subject} className="rating-row">
-                    <span className="rating-label">{subject}</span>
-                    <div className="rating-stars">
-                      {[1, 2, 3, 4, 5].map((val) => (
-                        <button
-                          key={val}
-                          className={"star-btn" + (current >= val ? " active" : "")}
-                          onClick={() => setAcademicRatings({ ...academicRatings, [subject]: val })}
-                        >★</button>
-                      ))}
+          {/* STEP 4: Academic */}
+          {currentStep === "academic" && (
+            <section className="step-card">
+              <h3 className="step-title">Academic Self-Assessment</h3>
+              <p className="step-subtitle">Rate your confidence in each subject (1 = low, 5 = high).</p>
+              <div className="ratings-list">
+                {academicSubjects.map((subject) => {
+                  const current = academicRatings[subject] || 0;
+                  return (
+                    <div key={subject} className="rating-row">
+                      <span className="rating-label">{subject}</span>
+                      <div className="rating-stars" role="group" aria-label={`${subject} confidence rating`}>
+                        {[1, 2, 3, 4, 5].map((val) => (
+                          <button
+                            key={val}
+                            type="button"
+                            className={"star-btn" + (current >= val ? " active" : "")}
+                            aria-label={`${val} star`}
+                            onClick={() => setAcademicRatings({ ...academicRatings, [subject]: val })}
+                          >★</button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="step-nav">
-              <button className="btn-back" onClick={handleBack}>← Back</button>
-              <button className="btn-next" onClick={handleNext} disabled={!canProceed()}>Submit ✓</button>
-            </div>
-          </div>
-        )}
+                  );
+                })}
+              </div>
+              <div className="step-nav">
+                <button type="button" className="btn-back" onClick={handleBack}>← Back</button>
+                <button type="button" className="btn-next" onClick={handleNext} disabled={!canProceed()}>
+                  Submit ✓
+                </button>
+              </div>
+            </section>
+          )}
 
-        {/* DONE */}
-        {currentStep === "done" && (
-          <div className="assessment-complete">
-            <div className="complete-icon">🎓</div>
-            <h2>Assessment Complete!</h2>
-            <p>Your personalized course recommendations are ready based on your strand, personality, and academic profile.</p>
-            <button className="primary-btn-assess" onClick={() => navigate("/dashboard")}>
-              View My Recommendations →
-            </button>
-          </div>
-        )}
+          {/* DONE */}
+          {currentStep === "done" && (
+            <section className="assessment-complete">
+              <div className="complete-icon" aria-hidden="true">🎓</div>
+              <h2>Assessment Complete!</h2>
+              <p>Your personalized course recommendations are ready based on your strand, personality, and academic profile.</p>
+              <button
+                type="button"
+                className="primary-btn-assess"
+                onClick={() => navigate("/dashboard")}
+              >
+                View My Recommendations →
+              </button>
+            </section>
+          )}
 
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
