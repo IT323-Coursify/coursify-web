@@ -5,7 +5,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Assessment from "./pages/Assessment";
 import Profile from "./pages/Profile";
-import CourseDetail from "./pages/CourseDetail";       
+import CourseDetail from "./pages/CourseDetail";  
+import Courses from "./pages/Courses";     
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/assessment" element={<Assessment />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/courses" element={<Courses />} />
         </Routes>
       </AssessmentProvider>
     </BrowserRouter>
