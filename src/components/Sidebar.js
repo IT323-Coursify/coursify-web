@@ -18,6 +18,10 @@ function Sidebar() {
           Assessment
         </NavLink>
         
+        <NavLink to="/courses" className="sidebar-link">
+          Courses
+        </NavLink>
+        
         <NavLink to="/profile" className="sidebar-link">
           Profile
         </NavLink>
