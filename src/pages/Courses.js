@@ -159,7 +159,6 @@ function CourseModal({ course, onClose }) {
 
         <div className="modal-duration">
           <span className="duration-badge">⏱ Duration: {course.duration}</span>
-          <span className="duration-hint">(Years of study needed)</span>
         </div>
 
         <div className="modal-section">
