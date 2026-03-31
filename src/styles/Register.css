@@ -3,6 +3,7 @@
   max-height: 90vh;
   overflow-y: auto;
   padding-right: 10px;
+  text-align: center;
 }
 
 .register-form-container::-webkit-scrollbar {

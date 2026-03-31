@@ -17,18 +17,16 @@
   padding: 60px;
 }
 
-/* Logo container */
 .logo-container {
   position: absolute;
   top: 40px;
   left: 30px;
 }
 
-/* Logo image */
 .logo-text {
   width: 200px;
   margin-bottom: 30px;
-  height: auto  ;
+  height: auto;
 }
 
 .brand-content h1 {
@@ -67,38 +65,69 @@
 
 .form-container h2 {
   font-size: 28px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   color: #1f2937;
+  text-align: center;
 }
 
-/* Input */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 6px;
+.form-container p {
+  font-size: 14px;
   color: #6b7280;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-.input-group input {
-  padding: 10px 0;
+/* ===== Input Box Style ===== */
+.input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 14px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+
+.input-box:focus-within {
+  border-color: #4da3f5;
+  background: #fff;
+}
+
+.input-icon-left {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.input-icon-right {
+  display: flex;
+  align-items: center;
+  background: none;
   border: none;
-  border-bottom: 2px solid #d1d5db;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.box-input {
+  flex: 1;
+  border: none;
   background: transparent;
   outline: none;
   font-size: 14px;
+  color: #1f2937;
+  padding: 12px 0;
 }
 
-.input-group input:focus {
-  border-bottom: 2px solid #6366f1;
+.box-input::placeholder {
+  color: #9ca3af;
 }
 
-/* Remember row */
+/* ===== Remember Row ===== */
 .remember-row {
   display: flex;
   justify-content: space-between;
@@ -118,7 +147,7 @@
   cursor: pointer;
 }
 
-/* Button */
+/* ===== Button ===== */
 .primary-btn {
   width: 100%;
   padding: 12px;
@@ -140,7 +169,7 @@
   margin-top: 15px;
   font-weight: bold;
   font-size: 14px;
-  color: #fbe122;
+  color: #e53e3e;
 }
 
 .signup-link {
@@ -148,13 +177,7 @@
   font-size: 13px;
 }
 
-.signup-link span {
-  color: #20AFAB;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .split-page {
     flex-direction: column;

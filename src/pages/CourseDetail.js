@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../components/SideBar";
 import { useRecommendations } from "../hooks/useRecommendation";
 import "../styles/CourseDetail.css";
 
@@ -21,7 +20,6 @@ function CourseDetail() {
       <div className="dashboard-layout">
         <Sidebar />
         <div className="dashboard-main">
-          <Header />
           <main className="dashboard">
             <section className="empty-state">
               <div className="empty-icon">🔍</div>
@@ -45,7 +43,6 @@ function CourseDetail() {
     <div className="dashboard-layout">
       <Sidebar />
       <div className="dashboard-main">
-        <Header />
         <main className="dashboard">
 
           <button
@@ -56,7 +53,6 @@ function CourseDetail() {
             ← Back to Recommendations
           </button>
 
-          {/* Hero */}
           <section className="detail-hero">
             <div>
               <h2 className="detail-title">{data.course}</h2>
@@ -67,13 +63,11 @@ function CourseDetail() {
             </span>
           </section>
 
-          {/* About */}
           <article className="detail-card">
             <h3>About this Course</h3>
             <p className="detail-desc">{data.description}</p>
           </article>
 
-          {/* Why Recommended */}
           <article className="detail-card">
             <h3>Why This Was Recommended For You</h3>
             <ul className="why-list">
@@ -86,7 +80,6 @@ function CourseDetail() {
             </ul>
           </article>
 
-          {/* Career Paths */}
           <article className="detail-card">
             <h3>Possible Career Paths</h3>
             <ul className="career-list">
@@ -99,7 +92,6 @@ function CourseDetail() {
             </ul>
           </article>
 
-          {/* CTA */}
           <section className="detail-cta">
             <p>Want better recommendations?</p>
             <button

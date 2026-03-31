@@ -1,237 +1,231 @@
-/* ===== Courses Page ===== */
-.courses-header {
-  margin-bottom: 30px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;600;700&display=swap');
 
+/* ── Page Header ─────────────────────────────────────── */
+.courses-header {
+  margin-bottom: 28px;
+}
+.courses-page {
+  padding: 36px 32px;
+}
 .courses-header h2 {
-  font-size: 28px;
-  margin: 0;
-  color: #333;
+  font-family: 'Sora', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
 }
 
 .courses-header p {
-  color: #666;
-  margin-top: 8px;
-  font-size: 14px;
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
 }
 
-/* ===== Courses Grid ===== */
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 25px;
-  margin-top: 30px;
+/* ── Programs Grid ───────────────────────────────────── */
+.programs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
-/* ===== Course Card ===== */
-.course-card {
+/* ── Program Card ────────────────────────────────────── */
+.program-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.program-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.program-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(135deg, #4da3f5, #2bbbad);
+  border-radius: 2px;
+}
+
+/* ── Program Courses Grid ────────────────────────────── */
+.program-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+/* ── Course Card ─────────────────────────────────────── */
+.course-card {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1.5px solid #e2e8f0;
   cursor: pointer;
-  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .course-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  background: white;
+  border-color: #4da3f5;
+  box-shadow: 0 4px 16px rgba(77,163,245,0.12);
+  transform: translateY(-2px);
 }
 
-.course-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.course-card-title {
-  font-size: 18px;
+.course-card h4 {
+  font-size: 14px;
   font-weight: 700;
-  color: #1f2937;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.course-card p {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
   margin: 0;
   flex: 1;
 }
 
-.course-duration {
-  font-size: 12px;
-  color: #4da3f5;
-  background: #e8f4f8;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.course-card-description {
-  font-size: 14px;
-  color: #6b7280;
-  line-height: 1.6;
-  margin: 12px 0 16px 0;
-}
-
-.course-card-footer {
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 12px;
-  margin-top: 4px;
-}
-
 .view-details {
-  font-size: 13px;
-  color: #FBB217;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4da3f5;
   transition: color 0.2s;
+  align-self: flex-start;
 }
 
-.course-card:hover .view-details {
-  color: #e0a045;
-}
+.course-card:hover .view-details { color: #2bbbad; }
 
-/* ===== Modal Overlay ===== */
+/* ── Modal Overlay ───────────────────────────────────── */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgba(15,23,42,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.2s ease;
   padding: 20px;
+  animation: fadeIn 0.2s ease;
+  backdrop-filter: blur(2px);
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* ===== Modal Content ===== */
+/* ── Modal Content ───────────────────────────────────── */
 .modal-content {
   background: white;
-  border-radius: 20px;
-  max-width: 700px;
+  border-radius: 22px;
+  max-width: 660px;
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  padding: 30px;
-  position: relative;
-  animation: slideUp 0.3s ease;
+  padding: 32px;
+  animation: slideUp 0.25s ease;
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .modal-title {
-  font-size: 26px;
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
   font-weight: 700;
-  color: #1f2937;
+  color: #1e293b;
   margin: 0;
   flex: 1;
+  line-height: 1.3;
 }
 
 .modal-close {
-  background: #f3f4f6;
+  background: #f1f5f9;
   border: none;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
-.modal-close:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
+.modal-close:hover { background: #e2e8f0; color: #1e293b; }
 
-/* ===== Modal Duration Badge ===== */
-.modal-duration {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-}
+.modal-duration { margin-bottom: 22px; }
 
 .duration-badge {
-  background: #e8f4f8;
+  background: #eff6ff;
   padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
   color: #4da3f5;
 }
 
-.duration-hint {
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-/* ===== Modal Sections ===== */
-.modal-section {
-  margin-bottom: 28px;
-}
+.modal-section { margin-bottom: 24px; }
 
 .modal-section h3 {
-  font-size: 18px;
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
   font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 12px 0;
+  color: #1e293b;
+  margin: 0 0 12px;
 }
 
 .modal-section p {
-  font-size: 15px;
-  color: #4b5563;
+  font-size: 14px;
+  color: #475569;
   line-height: 1.7;
   margin: 0;
 }
 
-/* ===== Career List in Modal ===== */
+/* Career List */
 .modal-section .career-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modal-section .career-list li {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-size: 14px;
   color: #374151;
   font-weight: 500;
@@ -245,20 +239,20 @@
   flex-shrink: 0;
 }
 
-/* ===== Future Work List ===== */
+/* Future Work List */
 .future-work-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .future-work-list li {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   font-size: 14px;
   color: #374151;
   line-height: 1.6;
@@ -266,107 +260,38 @@
 
 .checkmark {
   color: #2bbbad;
-  font-weight: bold;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 14px;
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
-/* ===== Modal Close Button ===== */
+/* Close Button */
 .modal-close-btn {
   width: 100%;
-  padding: 14px;
+  padding: 13px;
   background: linear-gradient(90deg, #4da3f5, #2bbbad);
   border: none;
   border-radius: 12px;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: 8px;
+  font-family: 'Nunito', sans-serif;
   transition: opacity 0.2s;
 }
 
-.modal-close-btn:hover {
-  opacity: 0.85;
-}
+.modal-close-btn:hover { opacity: 0.88; }
 
-/* ===== Scrollbar Styling ===== */
-.modal-content::-webkit-scrollbar {
-  width: 8px;
-}
+/* Scrollbar */
+.modal-content::-webkit-scrollbar       { width: 6px; }
+.modal-content::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.modal-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-.modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* ===== Responsive Design ===== */
+/* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
-  .courses-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .courses-header h2 {
-    font-size: 22px;
-  }
-
-  .course-card {
-    padding: 18px;
-  }
-
-  .course-card-title {
-    font-size: 16px;
-  }
-
-  .modal-content {
-    padding: 20px;
-    max-height: 90vh;
-  }
-
-  .modal-title {
-    font-size: 20px;
-  }
-
-  .modal-section h3 {
-    font-size: 16px;
-  }
-
-  .modal-section p,
-  .future-work-list li,
-  .modal-section .career-list li {
-    font-size: 13px;
-  }
-}
-
-/* ===== Loading State (Optional) ===== */
-.courses-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #f3f4f6;
-  border-top: 4px solid #4da3f5;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  .program-courses-grid { grid-template-columns: 1fr; }
+  .modal-content        { padding: 22px; }
+  .modal-title          { font-size: 18px; }
 }

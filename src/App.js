@@ -6,7 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Assessment from "./pages/Assessment";
 import Profile from "./pages/Profile";
 import CourseDetail from "./pages/CourseDetail";  
-import Courses from "./pages/Courses";     
+import Courses from "./pages/Courses";
+import AdminDashboard from "./pages/AdminDashboard"; // ← NEW
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} /> 
         </Routes>
       </AssessmentProvider>
     </BrowserRouter>
