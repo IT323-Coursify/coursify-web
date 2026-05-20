@@ -1,6 +1,6 @@
 {
   "name": "coursify",
-  "homepage": "https://IT323-Coursify.github.io/coursify-web",
+  "homepage": "/coursify-web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
