@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/SideBar";
+import Sidebar from "../components/Sidebar";
 import { useAssessment } from "../context/Assessmentcontext";
 import "../styles/Assessment.css";
 import API from "../config/api";

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import Sidebar from "../components/SideBar";
+import Sidebar from "../components/Sidebar";
 import "../styles/Courses.css";
 
 const programsData = [
