@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter basename="/coursify-web">
+    <BrowserRouter basename="/">
       <AssessmentProvider>
         <Routes>
           <Route path="/" element={<Login />} />
