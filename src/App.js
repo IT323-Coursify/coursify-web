@@ -1,13 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AssessmentProvider } from "./context/Assessmentcontext";
 import Login from "./pages/Login";
-import Register from "./pages/Register"; 
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Assessment from "./pages/Assessment";
 import Profile from "./pages/Profile";
-import CourseDetail from "./pages/CourseDetail";  
+import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
-import AdminDashboard from "./pages/AdminDashboard"; // ← NEW
+import AdminDashboard from "./pages/AdminDashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -15,13 +17,27 @@ function App() {
       <AssessmentProvider>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} /> 
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/assessment" element={<Assessment />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/courses" element={<Courses />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} /> 
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/superadmin/dashboard" element={
+            <ProtectedRoute requiredRole="superadmin">
+              <SuperAdminDashboard />
+            </ProtectedRoute>
+          } />
+
         </Routes>
       </AssessmentProvider>
     </BrowserRouter>

@@ -1,275 +1,280 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/SideBar";
 import { useAssessment } from "../context/Assessmentcontext";
-import { computeRecommendations } from "../utils/recommendationEngine";
 import "../styles/Assessment.css";
+import API from "../config/api";
 
-// ── Constants ────────────────────────────────────────────
+// ── Constants ────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "coursify_assessment_progress";
 
-const strandOptions = [
-  { value: "STEM", desc: "Science, Technology, Engineering & Mathematics" },
-  { value: "ABM", desc: "Accountancy, Business & Management" },
+const STRAND_OPTIONS = [
+  { value: "STEM",  desc: "Science, Technology, Engineering & Mathematics" },
+  { value: "ABM",   desc: "Accountancy, Business & Management" },
   { value: "HUMSS", desc: "Humanities & Social Sciences" },
-  { value: "TVL", desc: "Technical-Vocational-Livelihood" },
-  { value: "GAS", desc: "General Academic Strand" },
+  { value: "TVL",   desc: "Technical-Vocational-Livelihood" },
+  { value: "GAS",   desc: "General Academic Strand" },
 ];
 
-const riasecQuestions = [
-  { id: "q1", text: "Building or fixing things with my hands." },
-  { id: "q2", text: "Solving complex mathematical or scientific problems." },
-  { id: "q3", text: "Drawing, designing, or creating art and music." },
-  { id: "q4", text: "Helping, teaching, or counseling other people." },
-  { id: "q5", text: "Leading groups and persuading or convincing others." },
-  { id: "q6", text: "Organizing data, files, and following clear procedures." },
-  { id: "q7", text: "Working with tools, machines, or outdoor activities." },
-  { id: "q8", text: "Researching, analyzing, and investigating topics deeply." },
-  { id: "q9", text: "Expressing myself through writing, performance, or design." },
-  { id: "q10", text: "Volunteering, social work, or community service." },
-  { id: "q11", text: "Negotiating, selling, or starting new ventures." },
-  { id: "q12", text: "Working on structured tasks with clear rules and expectations." },
+const LIKERT_LABELS = [
+  "Strongly Disagree",
+  "Disagree",
+  "Neutral",
+  "Agree",
+  "Strongly Agree",
 ];
 
-const mbtiQuestions = [
-  {
-    dimension: "EI",
-    question: "Which feels more natural to you?",
-    options: [
-      { label: "I feel more energized after spending time with a group of people.", value: "E" },
-      { label: "I feel more refreshed after spending time alone or in a quiet setting.", value: "I" },
-    ],
-  },
-  {
-    dimension: "EI",
-    question: "When you have a problem to work through, you usually...",
-    options: [
-      { label: "Talk it out with someone — saying it aloud helps me think.", value: "E" },
-      { label: "Reflect on it quietly by myself before sharing anything.", value: "I" },
-    ],
-  },
-  {
-    dimension: "SN",
-    question: "When you learn something new, you prefer...",
-    options: [
-      { label: "Step-by-step instructions with concrete, real-world examples.", value: "S" },
-      { label: "Understanding the big picture and the 'why' behind it first.", value: "N" },
-    ],
-  },
-  {
-    dimension: "SN",
-    question: "Which statement fits you more?",
-    options: [
-      { label: "I trust what I can see, touch, or experience directly.", value: "S" },
-      { label: "I often think about possibilities and what could be, not just what is.", value: "N" },
-    ],
-  },
-  {
-    dimension: "TF",
-    question: "When making an important decision, you tend to...",
-    options: [
-      { label: "Focus on the facts and what makes the most logical sense.", value: "T" },
-      { label: "Consider how the decision will affect the people involved.", value: "F" },
-    ],
-  },
-  {
-    dimension: "TF",
-    question: "If a friend made a mistake, you would most likely...",
-    options: [
-      { label: "Point out what went wrong and how they can fix it practically.", value: "T" },
-      { label: "Focus on how they are feeling and offer emotional support first.", value: "F" },
-    ],
-  },
-  {
-    dimension: "JP",
-    question: "Which describes your ideal way of handling tasks?",
-    options: [
-      { label: "I like to plan ahead, set deadlines, and finish things early.", value: "J" },
-      { label: "I prefer keeping things flexible and adapting as I go.", value: "P" },
-    ],
-  },
-  {
-    dimension: "JP",
-    question: "How do you feel when plans suddenly change?",
-    options: [
-      { label: "It bothers me — I prefer knowing what to expect in advance.", value: "J" },
-      { label: "I am fine with it — I actually enjoy a bit of spontaneity.", value: "P" },
-    ],
-  },
+const SECTIONS = [
+  { key: "strand",   title: "SHS Strand",           icon: "🎓", desc: "Your academic track" },
+  { key: "riasec",   title: "RIASEC Interests",      icon: "🧭", desc: "Holland Interest Inventory · 36 questions" },
+  { key: "bigfive",  title: "Big Five Personality",  icon: "🧠", desc: "OCEAN Personality Model · 25 questions" },
+  { key: "math",     title: "Math Aptitude",          icon: "📐", desc: "Algebra, Geometry, Statistics, Logic · 12 questions" },
+  { key: "science",  title: "Science Aptitude",       icon: "🔬", desc: "Biology, Physics, Chemistry, Earth Science · 12 questions" },
+  { key: "english",  title: "English Aptitude",       icon: "📖", desc: "Grammar, Reading, Vocabulary, Verbal Reasoning · 12 questions" },
+  { key: "abstract", title: "Abstract Reasoning",     icon: "🔷", desc: "Patterns, Sequences, Spatial & Analogical Reasoning · 12 questions" },
 ];
 
-// ── Academic Questions (10 per subject, mix of MCQ + Likert) ──
-const academicQuestions = {
-  Math: [
-    { id: "m1", type: "likert", text: "I understand how to solve linear equations." },
-    { id: "m2", type: "mcq", text: "What is the value of x in: 2x + 6 = 14?", options: ["x = 3", "x = 4", "x = 5", "x = 10"], answer: "x = 4" },
-    { id: "m3", type: "likert", text: "I can apply the Pythagorean theorem to solve problems." },
-    { id: "m4", type: "mcq", text: "What is 15% of 200?", options: ["25", "30", "35", "40"], answer: "30" },
-    { id: "m5", type: "likert", text: "I am comfortable working with fractions and decimals." },
-    { id: "m6", type: "mcq", text: "Simplify: (x² + 5x + 6) ÷ (x + 2)", options: ["x + 3", "x + 2", "x − 3", "x − 2"], answer: "x + 3" },
-    { id: "m7", type: "likert", text: "I can interpret graphs and data charts accurately." },
-    { id: "m8", type: "mcq", text: "What is the area of a triangle with base 8 and height 5?", options: ["20", "40", "13", "80"], answer: "20" },
-    { id: "m9", type: "likert", text: "I find it easy to follow mathematical proofs." },
-    { id: "m10", type: "mcq", text: "If a square has a perimeter of 36, what is its area?", options: ["81", "72", "64", "36"], answer: "81" },
-  ],
-  Science: [
-    { id: "s1", type: "likert", text: "I understand the basic laws of motion (Newton's Laws)." },
-    { id: "s2", type: "mcq", text: "What is the powerhouse of the cell?", options: ["Nucleus", "Ribosome", "Mitochondria", "Vacuole"], answer: "Mitochondria" },
-    { id: "s3", type: "likert", text: "I can explain how photosynthesis works." },
-    { id: "s4", type: "mcq", text: "What gas do plants absorb during photosynthesis?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], answer: "Carbon Dioxide" },
-    { id: "s5", type: "likert", text: "I understand the difference between physical and chemical changes." },
-    { id: "s6", type: "mcq", text: "What is the atomic number of Carbon?", options: ["6", "12", "8", "14"], answer: "6" },
-    { id: "s7", type: "likert", text: "I am confident reading and interpreting scientific data." },
-    { id: "s8", type: "mcq", text: "What type of rock is formed from cooled lava?", options: ["Sedimentary", "Metamorphic", "Igneous", "Limestone"], answer: "Igneous" },
-    { id: "s9", type: "likert", text: "I understand how ecosystems and food chains work." },
-    { id: "s10", type: "mcq", text: "Which planet is closest to the sun?", options: ["Venus", "Earth", "Mercury", "Mars"], answer: "Mercury" },
-  ],
-  English: [
-    { id: "e1", type: "likert", text: "I can write a clear and organized paragraph." },
-    { id: "e2", type: "mcq", text: "Which sentence is grammatically correct?", options: ["She don't know the answer.", "She doesn't knows the answer.", "She doesn't know the answer.", "She not know the answer."], answer: "She doesn't know the answer." },
-    { id: "e3", type: "likert", text: "I understand literary devices like metaphors and similes." },
-    { id: "e4", type: "mcq", text: "What is the synonym of 'benevolent'?", options: ["Cruel", "Kind", "Angry", "Strict"], answer: "Kind" },
-    { id: "e5", type: "likert", text: "I can identify the main idea of a reading passage." },
-    { id: "e6", type: "mcq", text: "Which is an example of a compound sentence?", options: ["The dog ran.", "I was tired, but I finished my work.", "Running fast.", "Because it rained."], answer: "I was tired, but I finished my work." },
-    { id: "e7", type: "likert", text: "I am comfortable doing oral presentations in English." },
-    { id: "e8", type: "mcq", text: "What does the word 'ambiguous' mean?", options: ["Very clear", "Open to multiple interpretations", "Very loud", "Absolutely certain"], answer: "Open to multiple interpretations" },
-    { id: "e9", type: "likert", text: "I can write persuasive essays effectively." },
-    { id: "e10", type: "mcq", text: "Which of these is a proper noun?", options: ["city", "teacher", "Manila", "building"], answer: "Manila" },
-  ],
-  Computer: [
-    { id: "c1", type: "likert", text: "I am comfortable using spreadsheet software (Excel/Sheets)." },
-    { id: "c2", type: "mcq", text: "What does CPU stand for?", options: ["Central Processing Unit", "Computer Power Unit", "Central Power Upgrade", "Core Processing Unit"], answer: "Central Processing Unit" },
-    { id: "c3", type: "likert", text: "I understand basic programming concepts like loops and conditions." },
-    { id: "c4", type: "mcq", text: "Which of these is NOT a programming language?", options: ["Python", "HTML", "Photoshop", "JavaScript"], answer: "Photoshop" },
-    { id: "c5", type: "likert", text: "I can troubleshoot basic computer hardware problems." },
-    { id: "c6", type: "mcq", text: "What does 'RAM' stand for?", options: ["Random Access Memory", "Read And Memorize", "Rapid Application Module", "Runtime Array Memory"], answer: "Random Access Memory" },
-    { id: "c7", type: "likert", text: "I understand how the internet and networks work." },
-    { id: "c8", type: "mcq", text: "Which file format is used for images?", options: [".mp3", ".exe", ".png", ".docx"], answer: ".png" },
-    { id: "c9", type: "likert", text: "I can create and format basic documents and presentations." },
-    { id: "c10", type: "mcq", text: "What is the function of an operating system?", options: ["Browse the internet", "Manage hardware and software resources", "Edit photos", "Store files only"], answer: "Manage hardware and software resources" },
-  ],
-  Filipino: [
-    { id: "f1", type: "likert", text: "Nakakasulat ako ng malinaw na talata sa Filipino." },
-    { id: "f2", type: "mcq", text: "Alin sa mga sumusunod ang tamang baybay?", options: ["Palengke", "Palingke", "Palenkge", "Palengque"], answer: "Palengke" },
-    { id: "f3", type: "likert", text: "Naiintindihan ko ang mga akdang pampanitikan sa Filipino." },
-    { id: "f4", type: "mcq", text: "Ano ang kahulugan ng salitang 'maunawain'?", options: ["Mapagmataas", "Magalang", "Mapagpasensya", "Mapagbigay"], answer: "Mapagpasensya" },
-    { id: "f5", type: "likert", text: "Kaya kong tukuyin ang paksa ng isang pahayag." },
-    { id: "f6", type: "mcq", text: "Aling pangungusap ang may tamang bantas?", options: ["Kumain ka na ba", "Kumain ka na ba?", "Kumain ka na ba!", "Kumain ka na ba,"], answer: "Kumain ka na ba?" },
-    { id: "f7", type: "likert", text: "Komportable akong magsalita sa harap ng klase sa Filipino." },
-    { id: "f8", type: "mcq", text: "Ano ang uri ng pangungusap na nagpapahayag ng utos?", options: ["Pasalaysay", "Patanong", "Padamdam", "Pautos"], answer: "Pautos" },
-    { id: "f9", type: "likert", text: "Naiisulat ko ang aking mga nararamdaman sa pamamagitan ng tula." },
-    { id: "f10", type: "mcq", text: "Sino ang itinuturing na 'Ama ng Wikang Pambansa'?", options: ["Jose Rizal", "Lope K. Santos", "Manuel Quezon", "Andres Bonifacio"], answer: "Lope K. Santos" },
-  ],
-  Humanities: [
-    { id: "h1", type: "likert", text: "I understand the major events of Philippine history." },
-    { id: "h2", type: "mcq", text: "What document ended Spanish rule in the Philippines?", options: ["Treaty of Paris", "Malolos Constitution", "Proclamation of Independence", "KKK Manifesto"], answer: "Treaty of Paris" },
-    { id: "h3", type: "likert", text: "I can analyze how historical events affect present society." },
-    { id: "h4", type: "mcq", text: "Who wrote the Noli Me Tangere?", options: ["Andres Bonifacio", "Emilio Aguinaldo", "Jose Rizal", "Marcelo del Pilar"], answer: "Jose Rizal" },
-    { id: "h5", type: "likert", text: "I understand basic concepts in economics and government." },
-    { id: "h6", type: "mcq", text: "What type of government does the Philippines follow?", options: ["Monarchy", "Federal Republic", "Unitary Presidential Republic", "Parliamentary"], answer: "Unitary Presidential Republic" },
-    { id: "h7", type: "likert", text: "I can distinguish between different cultural and social perspectives." },
-    { id: "h8", type: "mcq", text: "What does 'GDP' stand for?", options: ["General Daily Production", "Gross Domestic Product", "Government Development Plan", "Global Demand Price"], answer: "Gross Domestic Product" },
-    { id: "h9", type: "likert", text: "I enjoy reading about social issues and current events." },
-    { id: "h10", type: "mcq", text: "Which branch of government makes the laws in the Philippines?", options: ["Executive", "Judicial", "Legislative", "Military"], answer: "Legislative" },
-  ],
-};
 
-const SUBJECTS = Object.keys(academicQuestions);
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-// Likert options
-const LIKERT = [
-  { label: "Strongly Disagree", value: 0 },
-  { label: "Disagree", value: 0 },
-  { label: "Neutral", value: 1 },
-  { label: "Agree", value: 1 },
-  { label: "Strongly Agree", value: 1 },
-];
+/**
+ * Decode the user ID from the JWT stored in localStorage.
+ * Returns null if the token is missing or malformed.
+ */
+function getCurrentUserId() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    // Support both "sub" and "id" claims depending on your backend
+    return payload.sub ?? payload.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
-// ── Section statuses ─────────────────────────────────────
-const SECTIONS = ["strand", "riasec", "mbti", "academic"];
+/**
+ * Load saved draft from localStorage only if it belongs to the current user.
+ * If the userId doesn't match, the stale entry is removed immediately.
+ */
+function loadSaved(currentUserId) {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (!s) return {};
+    const parsed = JSON.parse(s);
+    if (parsed.userId && parsed.userId !== currentUserId) {
+      // Different user — discard and start fresh
+      localStorage.removeItem(STORAGE_KEY);
+      return {};
+    }
+    return parsed;
+  } catch {
+    return {};
+  }
+}
 
-const sectionLabels = {
-  strand: { title: "SHS Strand", icon: "🎓", desc: "Your academic track" },
-  riasec: { title: "RIASEC Interests", icon: "🧭", desc: "Holland Interest Inventory" },
-  mbti: { title: "Personality (MBTI)", icon: "🧠", desc: "4 personality dimensions" },
-  academic: { title: "Academic Assessment", icon: "📚", desc: "10 questions × 6 subjects" },
-};
+function isSectionComplete(key, questions, answers) {
+  if (key === "strand") return !!answers.strand;
 
-function sectionComplete(section, data) {
-  if (section === "strand") return !!data.strand;
-  if (section === "riasec") return Object.keys(data.riasecAnswers || {}).length === 12;
-  if (section === "mbti") return Object.keys(data.mbtiAnswers || {}).length === 8;
-  if (section === "academic") {
-    return SUBJECTS.every(sub =>
-      Object.keys((data.academicAnswers || {})[sub] || {}).length === 10
+  if (key === "riasec") {
+    return (
+      questions?.riasec &&
+      Object.keys(answers.riasecAnswers || {}).length === questions.riasec.length
     );
   }
+
+  if (key === "bigfive") {
+    return (
+      questions?.bigfive &&
+      Object.keys(answers.bigfiveAnswers || {}).length === questions.bigfive.length
+    );
+  }
+
+  if (["math", "science", "english", "abstract"].includes(key)) {
+    const qs = questions?.aptitude?.[key];
+    return (
+      qs &&
+      Object.keys((answers.aptitudeAnswers || {})[key] || {}).length === qs.length
+    );
+  }
+
   return false;
 }
 
-// ── Main Component ───────────────────────────────────────
+function SectionProgress({ current, total }) {
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+  return (
+    <div className="section-progress">
+      <div className="section-progress-track">
+        <div className="section-progress-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <span className="section-progress-label">{current}/{total}</span>
+    </div>
+  );
+}
+
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function Assessment() {
   const navigate = useNavigate();
-  const { setAssessmentAnswers, setRecommendations } = useAssessment();
+  const {
+    questions, setQuestions,
+    questionsLoading, setQuestionsLoading,
+    questionsError,   setQuestionsError,
+    setAssessmentAnswers, setResultId,
+  } = useAssessment();
 
-  // Load saved progress
-  const loadSaved = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
-  };
+  // Resolve current user ID once on render (stable for the session)
+  const currentUserId = getCurrentUserId();
 
+  // Load draft only if it was saved by the same user
+  const saved = loadSaved(currentUserId);
+
+  // ── Answer state ──
+  const [strand,          setStrand]          = useState(saved.strand          || null);
+  const [riasecAnswers,   setRiasecAnswers]   = useState(saved.riasecAnswers   || {});
+  const [bigfiveAnswers,  setBigfiveAnswers]  = useState(saved.bigfiveAnswers  || {});
+  const [aptitudeAnswers, setAptitudeAnswers] = useState(saved.aptitudeAnswers || {});
+
+  // ── UI state ──
   const [openSection, setOpenSection] = useState(null);
-  const [strand, setStrand] = useState(loadSaved().strand || null);
-  const [riasecAnswers, setRiasecAnswers] = useState(loadSaved().riasecAnswers || {});
-  const [mbtiAnswers, setMbtiAnswers] = useState(loadSaved().mbtiAnswers || {});
-  const [academicAnswers, setAcademicAnswers] = useState(loadSaved().academicAnswers || {});
-  const [activeSubject, setActiveSubject] = useState(SUBJECTS[0]);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted,   setSubmitted]   = useState(false);
+  const [submitting,  setSubmitting]  = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const currentData = { strand, riasecAnswers, mbtiAnswers, academicAnswers };
-
-  // Auto-save progress
+  // ── Auto-save progress (scoped to current user) ──
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-  }, [strand, riasecAnswers, mbtiAnswers, academicAnswers]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      userId: currentUserId,          // ← ties the draft to this account
+      strand,
+      riasecAnswers,
+      bigfiveAnswers,
+      aptitudeAnswers,
+    }));
+  }, [currentUserId, strand, riasecAnswers, bigfiveAnswers, aptitudeAnswers]);
 
-  const allComplete = SECTIONS.every(s => sectionComplete(s, currentData));
+  // ── Fetch questions ──────────────────────────────────────────────────────
+const fetchQuestions = useCallback(async () => {
+  const token = localStorage.getItem("token");
+  if (!token) { navigate("/"); return; }
+  try {
+    setQuestionsLoading(true);
+    setQuestionsError(null);
+    const res  = await fetch(`${API}/api/assessment/questions`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Failed to load questions.");
+    setQuestions(data);
 
-  const completedCount = SECTIONS.filter(s => sectionComplete(s, currentData)).length;
-  const progress = Math.round((completedCount / SECTIONS.length) * 100);
+    // ── FIX: scrub any stale answer keys not in the new question set ──
+    const freshRiasecIds  = new Set(data.riasec.map(q => q._id));
+    const freshBigfiveIds = new Set(data.bigfive.map(q => q._id));
+    const freshAptitudeIds = {
+      math:     new Set(data.aptitude.math.map(q => q._id)),
+      science:  new Set(data.aptitude.science.map(q => q._id)),
+      english:  new Set(data.aptitude.english.map(q => q._id)),
+      abstract: new Set(data.aptitude.abstract.map(q => q._id)),
+    };
 
-  // Academic answer helper
-  const setAcademicAnswer = (subject, qid, value) => {
-    setAcademicAnswers(prev => ({
+    setRiasecAnswers(prev =>
+      Object.fromEntries(Object.entries(prev).filter(([id]) => freshRiasecIds.has(id)))
+    );
+    setBigfiveAnswers(prev =>
+      Object.fromEntries(Object.entries(prev).filter(([id]) => freshBigfiveIds.has(id)))
+    );
+    setAptitudeAnswers(prev => {
+      const cleaned = {};
+      for (const subj of ["math", "science", "english", "abstract"]) {
+        cleaned[subj] = Object.fromEntries(
+          Object.entries(prev[subj] || {}).filter(([id]) => freshAptitudeIds[subj].has(id))
+        );
+      }
+      return cleaned;
+    });
+
+  } catch (err) {
+    setQuestionsError(err.message);
+  } finally {
+    setQuestionsLoading(false);
+  }
+}, [navigate, setQuestions, setQuestionsLoading, setQuestionsError]);
+
+  /**
+   * FIX: Always fetch fresh questions on mount.
+   *
+   * The previous code skipped the fetch if `questions` was already set in
+   * context (`if (!questions) fetchQuestions()`). That meant switching accounts
+   * in the same browser session reused the old question set (with different _ids
+   * than the new user's saved answers), so isSectionComplete() never returned
+   * true and "Save & Close" / the submit button never appeared.
+   *
+   * Clearing context (`setQuestions(null)`) on logout (see Sidebar.jsx) also
+   * helps, but always fetching here is the safe belt-and-suspenders fix.
+   */
+  useEffect(() => {
+    fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally run once on mount only
+
+  // ── Progress ──
+  const answersObj = { strand, riasecAnswers, bigfiveAnswers, aptitudeAnswers };
+
+  const completedSections = SECTIONS.filter(s =>
+    isSectionComplete(s.key, questions, answersObj)
+  ).length;
+  const overallPct  = Math.round((completedSections / SECTIONS.length) * 100);
+  const allComplete = completedSections === SECTIONS.length;
+
+  // ── Answer helpers ──
+  const setAptitudeAnswer = (subject, qid, value) => {
+    setAptitudeAnswers(prev => ({
       ...prev,
       [subject]: { ...(prev[subject] || {}), [qid]: value },
     }));
   };
 
-  const handleSubmit = () => {
-    const answers = { strand, riasecAnswers, mbtiAnswers, academicAnswers };
-    const results = computeRecommendations(answers);
-    setAssessmentAnswers(answers);
-    setRecommendations(results);
+  // ── Submit ──
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("token");
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      // Flatten { math: { qid: "A" }, science: { qid: "B" } }
+      // into   { qid: "A", qid2: "B" } — what the backend expects
+      const flatAptitudeAnswers = Object.values(aptitudeAnswers).reduce(
+        (acc, subjectAnswers) => ({ ...acc, ...subjectAnswers }),
+        {}
+      );
 
-    const historyEntry = {
-      date: new Date().toLocaleDateString("en-PH", {
-        year: "numeric", month: "short", day: "numeric",
-        hour: "2-digit", minute: "2-digit",
-      }),
-      strand: answers.strand,
-      recommendations: results.slice(0, 5),
-    };
-    const existing = JSON.parse(localStorage.getItem("coursify_history") || "[]");
-    localStorage.setItem("coursify_history",
-      JSON.stringify([historyEntry, ...existing].slice(0, 10)));
-    localStorage.removeItem(STORAGE_KEY);
-    setSubmitted(true);
+      const res = await fetch(`${API}/api/assessment/submit`, {
+        method:  "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          strand,
+          riasec_answers:   riasecAnswers,
+          bigfive_answers:  bigfiveAnswers,
+          aptitude_answers: flatAptitudeAnswers,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Submission failed.");
+
+      setAssessmentAnswers({ strand, riasecAnswers, bigfiveAnswers, aptitudeAnswers });
+      setResultId(data.result_id);
+      localStorage.removeItem(STORAGE_KEY);
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  // ── Render ───────────────────────────────────────────
+  // ── Submitted screen ──
   if (submitted) {
     return (
       <div className="dashboard-layout">
@@ -279,10 +284,10 @@ export default function Assessment() {
             <section className="assessment-complete">
               <div className="complete-icon">🎓</div>
               <h2>Assessment Complete!</h2>
-              <p>Your personalized course recommendations are ready based on your strand, personality, and academic profile.</p>
+              <p>Your answers have been saved. Course recommendations will be generated soon.</p>
               <button type="button" className="primary-btn-assess"
                 onClick={() => navigate("/dashboard")}>
-                View My Recommendations →
+                Back to Dashboard →
               </button>
             </section>
           </main>
@@ -291,231 +296,136 @@ export default function Assessment() {
     );
   }
 
+  // ── Loading ──
+  if (questionsLoading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar />
+        <div className="dashboard-main">
+          <main className="assessment-page">
+            <div className="questions-loading">
+              <div className="loading-spinner" />
+              <p>Loading your assessment questions...</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Error ──
+  if (questionsError) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar />
+        <div className="dashboard-main">
+          <main className="assessment-page">
+            <div className="questions-error">
+              <p>⚠️ {questionsError}</p>
+              <button type="button" className="primary-btn-assess" onClick={fetchQuestions}>
+                Retry
+              </button>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main render ──
   return (
     <div className="dashboard-layout">
       <Sidebar />
       <div className="dashboard-main">
         <main className="assessment-page">
 
-          {/* Page Header */}
+          {/* Header */}
           <div className="assessment-header">
             <div>
-              <h2>Profile Assessment</h2>
-              <p>Complete all four sections — you can save and continue anytime.</p>
+              <h2>Course Assessment</h2>
+              <p>Complete all sections — your progress saves automatically.</p>
             </div>
-            {completedCount > 0 && (
-              <span className="progress-badge">{completedCount}/{SECTIONS.length} completed</span>
-            )}
+            <span className="progress-badge">{completedSections}/{SECTIONS.length} completed</span>
           </div>
 
-          {/* Overall Progress */}
+          {/* Overall progress bar */}
           <div className="overall-progress">
             <div className="overall-progress-track">
-              <div className="overall-progress-fill" style={{ width: `${progress}%` }} />
+              <div className="overall-progress-fill" style={{ width: `${overallPct}%` }} />
             </div>
-            <span className="overall-progress-label">{progress}% complete</span>
+            <span className="overall-progress-label">{overallPct}% complete</span>
           </div>
 
-          {/* Section Cards */}
+          {/* Section cards */}
           <div className="section-cards">
             {SECTIONS.map((section) => {
-              const done = sectionComplete(section, currentData);
-              const isOpen = openSection === section;
-              const info = sectionLabels[section];
+              const done   = isSectionComplete(section.key, questions, answersObj);
+              const isOpen = openSection === section.key;
 
               return (
-                <div key={section} className={`section-card ${done ? "done" : ""} ${isOpen ? "open" : ""}`}>
+                <div key={section.key}
+                  className={`section-card ${done ? "done" : ""} ${isOpen ? "open" : ""}`}>
 
-                  {/* Section Header */}
-                  <button
-                    type="button"
-                    className="section-card-header"
-                    onClick={() => setOpenSection(isOpen ? null : section)}
-                  >
+                  <button type="button" className="section-card-header"
+                    onClick={() => setOpenSection(isOpen ? null : section.key)}>
                     <div className="section-card-left">
-                      <span className="section-icon">{info.icon}</span>
+                      <span className="section-icon">{section.icon}</span>
                       <div>
-                        <span className="section-card-title">{info.title}</span>
-                        <span className="section-card-desc">{info.desc}</span>
+                        <span className="section-card-title">{section.title}</span>
+                        <span className="section-card-desc">{section.desc}</span>
                       </div>
                     </div>
                     <div className="section-card-right">
                       {done
                         ? <span className="section-status done-badge">✓ Complete</span>
-                        : <span className="section-status pending-badge">Pending</span>
-                      }
+                        : <span className="section-status pending-badge">Pending</span>}
                       <span className="section-chevron">{isOpen ? "▲" : "▼"}</span>
                     </div>
                   </button>
 
-                  {/* Section Body */}
                   {isOpen && (
                     <div className="section-body">
 
-                      {/* ── STRAND ── */}
-                      {section === "strand" && (
-                        <div>
-                          <p className="step-subtitle">Select your Senior High School strand.</p>
-                          <div className="strand-grid">
-                            {strandOptions.map((s) => (
-                              <button key={s.value} type="button"
-                                className={"strand-btn" + (strand === s.value ? " selected" : "")}
-                                aria-pressed={strand === s.value}
-                                onClick={() => setStrand(s.value)}>
-                                <span className="strand-name">{s.value}</span>
-                                <span className="strand-desc">{s.desc}</span>
-                              </button>
-                            ))}
-                          </div>
-                          {strand && (
-                            <button type="button" className="section-done-btn"
-                              onClick={() => setOpenSection(null)}>
-                              Save & Close ✓
-                            </button>
-                          )}
-                        </div>
+                      {section.key === "strand" && (
+                        <StrandSection
+                          strand={strand}
+                          setStrand={setStrand}
+                          onDone={() => setOpenSection(null)}
+                        />
                       )}
 
-                      {/* ── RIASEC ── */}
-                      {section === "riasec" && (
-                        <div>
-                          <p className="step-subtitle">Rate how much each activity interests you — 1 (not at all) to 5 (very much).</p>
-                          <div className="riasec-list">
-                            {riasecQuestions.map((q, i) => {
-                              const current = riasecAnswers[q.id] || 0;
-                              return (
-                                <div key={q.id} className="riasec-row">
-                                  <span className="riasec-num">{i + 1}</span>
-                                  <span className="riasec-text">{q.text}</span>
-                                  <div className="rating-stars">
-                                    {[1, 2, 3, 4, 5].map((val) => (
-                                      <button key={val} type="button"
-                                        className={"star-btn" + (current >= val ? " active" : "")}
-                                        aria-label={`${val} star`}
-                                        onClick={() => setRiasecAnswers({ ...riasecAnswers, [q.id]: val })}>
-                                        ★
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {sectionComplete("riasec", currentData) && (
-                            <button type="button" className="section-done-btn"
-                              onClick={() => setOpenSection(null)}>
-                              Save & Close ✓
-                            </button>
-                          )}
-                        </div>
+                      {section.key === "riasec" && questions?.riasec && (
+                        <LikertSection
+                          questions={questions.riasec}
+                          answers={riasecAnswers}
+                          setAnswers={setRiasecAnswers}
+                          subtitle="Rate how much each activity interests you."
+                          onDone={() => setOpenSection(null)}
+                          done={done}
+                        />
                       )}
 
-                      {/* ── MBTI ── */}
-                      {section === "mbti" && (
-                        <div>
-                          <p className="step-subtitle">
-                            Choose the option that feels most like you for each situation.
-                          </p>
-                          <div className="mbti-list">
-                            {mbtiQuestions.map((q, i) => (
-                              <div key={i} className="mbti-question">
-                                <p className="mbti-q-text">{q.question}</p>
-                                <div className="mbti-options">
-                                  {q.options.map((opt) => (
-                                    <button key={opt.value} type="button"
-                                      className={"mbti-opt" + (mbtiAnswers[i] === opt.value ? " selected" : "")}
-                                      aria-pressed={mbtiAnswers[i] === opt.value}
-                                      onClick={() => setMbtiAnswers({ ...mbtiAnswers, [i]: opt.value })}>
-                                      <span className="mbti-label">{opt.label}</span>
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          {sectionComplete("mbti", currentData) && (
-                            <button type="button" className="section-done-btn"
-                              onClick={() => setOpenSection(null)}>
-                              Save & Close ✓
-                            </button>
-                          )}
-                        </div>
+                      {section.key === "bigfive" && questions?.bigfive && (
+                        <LikertSection
+                          questions={questions.bigfive}
+                          answers={bigfiveAnswers}
+                          setAnswers={setBigfiveAnswers}
+                          subtitle="Rate how accurately each statement describes you."
+                          onDone={() => setOpenSection(null)}
+                          done={done}
+                        />
                       )}
 
-                      {/* ── ACADEMIC ── */}
-                      {section === "academic" && (
-                        <div>
-                          <p className="step-subtitle">Answer 10 questions per subject. Progress saves automatically.</p>
-
-                          {/* Subject Tabs */}
-                          <div className="subject-tabs">
-                            {SUBJECTS.map((sub) => {
-                              const answered = Object.keys((academicAnswers[sub] || {})).length;
-                              const subDone = answered === 10;
-                              return (
-                                <button key={sub} type="button"
-                                  className={"subject-tab" + (activeSubject === sub ? " active" : "") + (subDone ? " done" : "")}
-                                  onClick={() => setActiveSubject(sub)}>
-                                  {subDone ? "✓ " : ""}{sub}
-                                  <span className="subject-tab-count">{answered}/10</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {/* Questions for active subject */}
-                          <div className="academic-questions">
-                            {academicQuestions[activeSubject].map((q, i) => {
-                              const answered = (academicAnswers[activeSubject] || {})[q.id];
-                              return (
-                                <div key={q.id} className={`academic-q ${answered !== undefined ? "answered" : ""}`}>
-                                  <p className="academic-q-text">
-                                    <span className="academic-q-num">{i + 1}.</span> {q.text}
-                                  </p>
-
-                                  {q.type === "mcq" && (
-                                    <div className="mcq-options">
-                                      {q.options.map((opt) => {
-                                        const isSelected = answered === opt;
-                                        return (
-                                          <button key={opt} type="button"
-                                            className={"mcq-opt" + (isSelected ? " selected" : "")}
-                                            aria-pressed={isSelected}
-                                            onClick={() => setAcademicAnswer(activeSubject, q.id, opt)}>
-                                            {opt}
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
-
-                                  {q.type === "likert" && (
-                                    <div className="likert-options">
-                                      {LIKERT.map((opt, li) => {
-                                        const isSelected = answered === opt.label;
-                                        return (
-                                          <button key={li} type="button"
-                                            className={"likert-opt" + (isSelected ? " selected" : "")}
-                                            aria-pressed={isSelected}
-                                            onClick={() => setAcademicAnswer(activeSubject, q.id, opt.label)}>
-                                            {opt.label}
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {sectionComplete("academic", currentData) && (
-                            <button type="button" className="section-done-btn"
-                              onClick={() => setOpenSection(null)}>
-                              Save & Close ✓
-                            </button>
-                          )}
-                        </div>
+                      {["math","science","english","abstract"].includes(section.key) &&
+                        questions?.aptitude?.[section.key] && (
+                        <AptitudeSection
+                          subject={section.key}
+                          questions={questions.aptitude[section.key]}
+                          answers={(aptitudeAnswers[section.key] || {})}
+                          setAnswer={(qid, val) => setAptitudeAnswer(section.key, qid, val)}
+                          onDone={() => setOpenSection(null)}
+                          done={done}
+                        />
                       )}
 
                     </div>
@@ -525,21 +435,149 @@ export default function Assessment() {
             })}
           </div>
 
-          {/* Submit */}
+          {/* Submit area */}
           <div className="assessment-submit-area">
+            {submitError && <p className="submit-error">⚠️ {submitError}</p>}
             {allComplete ? (
-              <button type="button" className="submit-btn" onClick={handleSubmit}>
-                🎯 Generate My Recommendations
+              <button type="button" className="submit-btn"
+                onClick={handleSubmit} disabled={submitting}>
+                {submitting ? "Submitting..." : "🎯 Submit Assessment"}
               </button>
             ) : (
               <p className="submit-hint">
-                Complete all 4 sections above to generate your recommendations.
+                Complete all {SECTIONS.length} sections above to submit your assessment.
               </p>
             )}
           </div>
 
         </main>
       </div>
+    </div>
+  );
+}
+
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function StrandSection({ strand, setStrand, onDone }) {
+  return (
+    <div>
+      <p className="step-subtitle">Select your Senior High School strand.</p>
+      <div className="strand-grid">
+        {STRAND_OPTIONS.map((s) => (
+          <button key={s.value} type="button"
+            className={"strand-btn" + (strand === s.value ? " selected" : "")}
+            aria-pressed={strand === s.value}
+            onClick={() => setStrand(s.value)}>
+            <span className="strand-name">{s.value}</span>
+            <span className="strand-desc">{s.desc}</span>
+          </button>
+        ))}
+      </div>
+      {strand && (
+        <button type="button" className="section-done-btn" onClick={onDone}>
+          Save & Close ✓
+        </button>
+      )}
+    </div>
+  );
+}
+
+
+function LikertSection({ questions, answers, setAnswers, subtitle, onDone, done }) {
+  const answered = Object.keys(answers).length;
+  const total    = questions.length;
+
+  return (
+    <div>
+      <p className="step-subtitle">{subtitle}</p>
+
+      <div className="likert-legend">
+        {LIKERT_LABELS.map((label, i) => (
+          <div key={i} className="likert-legend-item">
+            <span className="likert-legend-num">{i + 1}</span>
+            <span className="likert-legend-label">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <SectionProgress current={answered} total={total} />
+
+      <div className="riasec-list">
+        {questions.map((q, i) => {
+          const current = answers[q._id] || 0;
+          return (
+            <div key={q._id} className={`riasec-row ${current ? "answered" : ""}`}>
+              <span className="riasec-num">{i + 1}</span>
+              <span className="riasec-text">{q.text}</span>
+              <div className="likert-scale">
+                {[1, 2, 3, 4, 5].map((val) => (
+                  <button key={val} type="button"
+                    className={"likert-btn" + (current === val ? " active" : "")}
+                    title={LIKERT_LABELS[val - 1]}
+                    onClick={() => setAnswers(prev => ({ ...prev, [q._id]: val }))}>
+                    {val}
+                  </button>
+                ))}
+                {current > 0 && (
+                  <span className="likert-selected-label">{LIKERT_LABELS[current - 1]}</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {done && (
+        <button type="button" className="section-done-btn" onClick={onDone}>
+          Save & Close ✓
+        </button>
+      )}
+    </div>
+  );
+}
+
+
+function AptitudeSection({ subject, questions, answers, setAnswer, onDone, done }) {
+  const answered = Object.keys(answers).length;
+  const total    = questions.length;
+
+  return (
+    <div>
+      <p className="step-subtitle">Choose the best answer for each question.</p>
+      <SectionProgress current={answered} total={total} />
+
+      {questions.map((q, i) => {
+        const selected = answers[q._id];
+        return (
+          <div key={q._id} className={`academic-q ${selected ? "answered" : ""}`}>
+            <p className="academic-q-text">
+              <span className="academic-q-num">{i + 1}.</span>
+              {q.text}
+            </p>
+            <div className="mcq-options">
+              {(q.options || []).map((opt) => {
+                const isSelected = selected === opt.label;
+                return (
+                  <button key={opt.label} type="button"
+                    className={"mcq-opt" + (isSelected ? " selected" : "")}
+                    aria-pressed={isSelected}
+                    onClick={() => setAnswer(q._id, opt.label)}>
+                    <span className="mcq-label">{opt.label}.</span>
+                    <span className="mcq-value">{opt.value}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+
+      {done && (
+        <button type="button" className="section-done-btn" onClick={onDone}>
+          Save & Close ✓
+        </button>
+      )}
     </div>
   );
 }

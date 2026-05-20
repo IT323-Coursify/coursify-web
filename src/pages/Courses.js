@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Sidebar from "../components/SideBar";
 import "../styles/Courses.css";
 
@@ -119,23 +119,36 @@ function CourseModal({ course, onClose }) {
   );
 }
 
-function CourseCard({ course, onClick }) {
+function HighlightText({ text, query }) {
+  if (!query.trim()) return <>{text}</>;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? <mark key={i} className="search-highlight">{part}</mark> : part
+      )}
+    </>
+  );
+}
+
+function CourseCard({ course, onClick, searchQuery }) {
   return (
     <div className="course-card" onClick={() => onClick(course)}>
-      <h4>{course.title}</h4>
-      <p>{course.description.substring(0, 100)}...</p>
+      <h4><HighlightText text={course.title} query={searchQuery} /></h4>
+      <p><HighlightText text={course.description.substring(0, 100) + "..."} query={searchQuery} /></p>
       <span className="view-details">Click for details →</span>
     </div>
   );
 }
 
-function ProgramCard({ program, onCourseClick }) {
+function ProgramCard({ program, onCourseClick, searchQuery }) {
   return (
     <div className="program-card">
       <h3 className="program-title">{program.title}</h3>
       <div className="program-courses-grid">
         {program.courses.map((course) => (
-          <CourseCard key={course.id} course={course} onClick={onCourseClick} />
+          <CourseCard key={course.id} course={course} onClick={onCourseClick} searchQuery={searchQuery} />
         ))}
       </div>
     </div>
@@ -145,6 +158,7 @@ function ProgramCard({ program, onCourseClick }) {
 export default function Courses() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCourseClick = (course) => {
     setSelectedCourse(course);
@@ -156,6 +170,30 @@ export default function Courses() {
     setModalOpen(false);
   };
 
+  const handleClearSearch = () => setSearchQuery("");
+
+  // Filter programs/courses based on search query
+  const filteredPrograms = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return programsData;
+
+    return programsData
+      .map((program) => {
+        const matchedCourses = program.courses.filter(
+          (course) =>
+            course.title.toLowerCase().includes(q) ||
+            course.description.toLowerCase().includes(q) ||
+            course.careerPaths.some((c) => c.toLowerCase().includes(q)) ||
+            course.futureWork.some((f) => f.toLowerCase().includes(q))
+        );
+        return matchedCourses.length > 0 ? { ...program, courses: matchedCourses } : null;
+      })
+      .filter(Boolean);
+  }, [searchQuery]);
+
+  const totalResults = filteredPrograms.reduce((sum, p) => sum + p.courses.length, 0);
+  const isSearching = searchQuery.trim().length > 0;
+
   return (
     <div className="dashboard-layout">
       <Sidebar />
@@ -165,11 +203,59 @@ export default function Courses() {
             <h2>Programs & Courses</h2>
             <p>Explore our programs. Click a course card to see full details.</p>
           </div>
-          <div className="programs-grid">
-            {programsData.map((program) => (
-              <ProgramCard key={program.id} program={program} onCourseClick={handleCourseClick} />
-            ))}
+
+          {/* Search Bar */}
+          <div className="search-wrapper">
+            <div className="search-bar">
+              <span className="search-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search courses, programs, or career paths..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {isSearching && (
+                <button className="search-clear" onClick={handleClearSearch} aria-label="Clear search">
+                  ✕
+                </button>
+              )}
+            </div>
+            {isSearching && (
+              <p className="search-results-count">
+                {totalResults > 0
+                  ? <><strong>{totalResults}</strong> course{totalResults !== 1 ? "s" : ""} found for "<em>{searchQuery}</em>"</>
+                  : <>No courses found for "<em>{searchQuery}</em>"</>
+                }
+              </p>
+            )}
           </div>
+
+          {/* Programs Grid or Empty State */}
+          {filteredPrograms.length > 0 ? (
+            <div className="programs-grid">
+              {filteredPrograms.map((program) => (
+                <ProgramCard
+                  key={program.id}
+                  program={program}
+                  onCourseClick={handleCourseClick}
+                  searchQuery={searchQuery}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="search-empty">
+              <div className="search-empty-icon">🔍</div>
+              <h3>No courses found</h3>
+              <p>Try a different keyword — like a course name, career, or program.</p>
+              <button className="search-empty-btn" onClick={handleClearSearch}>Clear search</button>
+            </div>
+          )}
         </main>
       </div>
       {modalOpen && <CourseModal course={selectedCourse} onClose={handleCloseModal} />}

@@ -1,19 +1,39 @@
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../components/SideBar";
-import { useRecommendations } from "../hooks/useRecommendation";
+import { useLatestResult } from "../hooks/useLatestResult";
 import "../styles/CourseDetail.css";
 
-function getScoreClass(score) {
-  if (score >= 80) return "high-score";
-  if (score >= 60) return "medium-score";
+function getScoreClass(confidence) {
+  if (confidence >= 30) return "high-score";
+  if (confidence >= 15) return "medium-score";
   return "low-score";
 }
 
 function CourseDetail() {
-  const { id } = useParams();
+  const { id } = useParams();          // id = rank (1-based) or index
   const navigate = useNavigate();
-  const { getCourseById } = useRecommendations();
-  const data = getCourseById(id);
+  const { result, loading } = useLatestResult();
+
+  // Find the course by rank or list index
+  const data = result?.recommendations?.find(
+    (r) => r.rank === parseInt(id) || String(r.rank) === id
+  );
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar />
+        <div className="dashboard-main">
+          <main className="dashboard">
+            <div className="detail-loading">
+              <div className="loading-spinner" />
+              <p>Loading course details…</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
@@ -50,47 +70,20 @@ function CourseDetail() {
             className="back-btn"
             onClick={() => navigate("/dashboard")}
           >
-            ← Back to Recommendations
+            ← Back to Dashboard
           </button>
 
           <section className="detail-hero">
             <div>
               <h2 className="detail-title">{data.course}</h2>
-              <p className="detail-reason">{data.reason}</p>
+              <p className="detail-reason">
+                Ranked #{data.rank} based on your RIASEC profile, Big Five personality, and aptitude scores.
+              </p>
             </div>
-            <span className={`match-score ${getScoreClass(data.matchScore)}`}>
-              Match Score: {data.matchScore}%
+            <span className={`match-score ${getScoreClass(data.confidence)}`}>
+              Confidence: {data.confidence}%
             </span>
           </section>
-
-          <article className="detail-card">
-            <h3>About this Course</h3>
-            <p className="detail-desc">{data.description}</p>
-          </article>
-
-          <article className="detail-card">
-            <h3>Why This Was Recommended For You</h3>
-            <ul className="why-list">
-              {(data.whyRecommended || [data.reason]).map((reason, i) => (
-                <li key={i}>
-                  <span className="why-icon" aria-hidden="true">✓</span>
-                  {reason}
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="detail-card">
-            <h3>Possible Career Paths</h3>
-            <ul className="career-list">
-              {data.careerPaths.map((career, i) => (
-                <li key={i}>
-                  <span className="career-dot" aria-hidden="true" />
-                  {career}
-                </li>
-              ))}
-            </ul>
-          </article>
 
           <section className="detail-cta">
             <p>Want better recommendations?</p>

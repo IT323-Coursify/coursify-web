@@ -1,62 +1,100 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const admins = [
-  { email: "admin@coursify.edu", password: "admin123", name: "Administrator" },
-];
-
-const users = [
-  { email: "student1@coursify.com", password: "123456", name: "User 1" },
-];
+import API from "../config/api";
 
 export function useAuth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMessage("");
+
+    // Validate fields
     if (!email || !password) {
       setMessage("Please fill in all fields.");
       return;
     }
 
-    // Check admin credentials first
-    const foundAdmin = admins.find(
-      (admin) => admin.email === email && admin.password === password
-    );
+    try {
+      setLoading(true);
 
-    if (foundAdmin) {
-      sessionStorage.setItem("coursify_user", foundAdmin.name);
-      sessionStorage.setItem("coursify_role", "admin");
-      setMessage(`Welcome, ${foundAdmin.name}!`);
-      navigate("/admin/dashboard");
-      return;
-    }
+      const response = await fetch(`${API}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    // Fall through to student check
-    const foundUser = users.find(
-      (user) => user.email === email && user.password === password
-    );
+      let data;
 
-    if (foundUser) {
-      sessionStorage.setItem("coursify_user", foundUser.name);
-      sessionStorage.setItem("coursify_role", "student");
-      setMessage(`Welcome, ${foundUser.name}! Login successful.`);
-      navigate("/dashboard");
-    } else {
-      setMessage("Invalid email or password.");
+      try {
+        data = await response.json();
+        console.log("LOGIN RESPONSE:", data);
+      } catch {
+        throw new Error("Invalid server response.");
+      }
+
+      // Handle backend errors
+      if (!response.ok) {
+        throw new Error(data.detail || "Login failed.");
+      }
+
+      // Save auth data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("coursify_user", JSON.stringify(data.user));
+      localStorage.setItem("coursify_role", data.user?.role);
+
+      // add these:
+      console.log("SAVED coursify_role:", localStorage.getItem("coursify_role"));
+      console.log("SAVED coursify_user:", localStorage.getItem("coursify_user"));
+      console.log("NAVIGATING TO role:", data.user?.role);
+
+      setMessage("Login successful!");
+
+      // Redirect based on role
+      const role = data.user?.role;
+
+      if (role === "superadmin") {
+        navigate("/superadmin/dashboard");
+      } else if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (error) {
+      setMessage(error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
-    email, setEmail,
-    password, setPassword,
+    email,
+    setEmail,
+
+    password,
+    setPassword,
+
     message,
-    showPassword, setShowPassword,
+
+    showPassword,
+    setShowPassword,
+
+    loading,
+
     handleSubmit,
   };
 }
