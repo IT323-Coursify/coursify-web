@@ -220,7 +220,7 @@ function StatCard({ label, value, sub, accent }) {
     </div>
   );
 }
-function Spinner() { return <div className="ad-loading"><div className="ad-spinner"/><span>Loading…</span></div>; }
+function Spinner() { return <div className="ad-loading"><div className="ad-spinner"/><span>Loading...</span></div>; }
 
 function poolBadge(pool) {
   const map = { riasec:"ad-badge-green", bigfive:"ad-badge-blue", aptitude:"ad-badge-purple" };
