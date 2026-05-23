@@ -184,7 +184,7 @@ body{background:var(--bg);}
 .ad-success{background:rgba(110,231,183,0.08);border:1px solid rgba(110,231,183,0.2);color:var(--accent);padding:12px 16px;border-radius:var(--radius-md);margin-bottom:16px;font-size:13px;}
 
 @keyframes spin{to{transform:rotate(360deg);}}
-@media(max-width:900px){.ad-sidebar{display:none;}.ad-main{padding:22px;}}
+@media(max-width:900px){.ad-main{padding:22px;}}
 @media(max-width:640px){.ad-title{font-size:24px;}.ad-main{padding:18px;}.ad-bottom-grid{grid-template-columns:1fr;}}
 `;
 
