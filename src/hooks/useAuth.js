@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 
 export function useAuth() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export function useAuth() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

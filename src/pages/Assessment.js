@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { useAssessment } from "../context/Assessmentcontext";
 import "../styles/Assessment.css";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "coursify_assessment_progress";
@@ -160,7 +160,7 @@ const fetchQuestions = useCallback(async () => {
   try {
     setQuestionsLoading(true);
     setQuestionsError(null);
-    const res  = await fetch(`${API}/api/assessment/questions`, {
+    const res  = await fetch(`${API_BASE_URL}/api/assessment/questions`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -247,7 +247,7 @@ const fetchQuestions = useCallback(async () => {
         {}
       );
 
-      const res = await fetch(`${API}/api/assessment/submit`, {
+      const res = await fetch(`${API_BASE_URL}/api/assessment/submit`, {
         method:  "POST",
         headers: {
           "Content-Type": "application/json",

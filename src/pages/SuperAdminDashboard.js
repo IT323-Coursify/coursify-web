@@ -5,8 +5,9 @@ import {
   PolarAngleAxis, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
+import API_BASE_URL from "../config/api";
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const API = API_BASE_URL; // to avoid "API is not defined" in helper functions
 
 const RANGE_OPTIONS = [
   { label: "Last 7 days", value: "7d" },

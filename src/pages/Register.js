@@ -4,7 +4,7 @@ import logoText from "../assets/logo-text.png";
 import coursifyLogo from "../assets/coursify-logo.png";
 import "../styles/Login.css";
 import "../styles/Register.css";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 
 function validatePassword(password) {
   if (password.length < 8) return "Password must be at least 8 characters.";
@@ -81,7 +81,7 @@ function Register() {
     }
     try {
       setLoading(true);
-      const response = await fetch(`${API}/api/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: fullName, email, password }),
@@ -103,7 +103,7 @@ function Register() {
     if (!code) { setIsError(true); setMessage("Please enter the verification code."); return; }
     try {
       setLoading(true);
-      const response = await fetch(`${API}/api/auth/verify`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),

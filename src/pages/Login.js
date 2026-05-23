@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logoText from "../assets/logo-text.png";
 import coursifyLogo from "../assets/coursify-logo.png";
 import "../styles/Login.css";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 
 // ── Password strength validator (mirrors backend rules) ──
 function validatePassword(password) {
@@ -75,7 +75,7 @@ function ForgotPasswordModal({ onClose }) {
     if (!email) { setIsError(true); setMessage("Please enter your email."); return; }
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/auth/forgot-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -97,7 +97,7 @@ function ForgotPasswordModal({ onClose }) {
     if (!code) { setIsError(true); setMessage("Please enter the code."); return; }
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/auth/reset-verify`, {
+      const res = await fetch(`$API_BASE_URL/api/auth/reset-verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -122,7 +122,7 @@ function ForgotPasswordModal({ onClose }) {
     if (newPassword !== confirmPass) { setIsError(true); setMessage("Passwords do not match."); return; }
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/auth/reset-password`, {
+      const res = await fetch(`$API_BASE_URL/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reset_token: resetToken, new_password: newPassword }),
@@ -289,7 +289,7 @@ function Login() {
     if (!email || !password) { setMessage("Please fill in all fields."); return; }
     try {
       setLoading(true);
-      const response = await fetch(`${API}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

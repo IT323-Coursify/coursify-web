@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { useLatestResult } from "../hooks/useLatestResult";
 import "../styles/Dashboard.css";
+import API_BASE_URL from "../config/api";
 
 // ─────────────────────────────────────────────────────────
 // Constants & helpers
@@ -115,7 +116,7 @@ function HistoryPanel({ isOpen, onClose }) {
     if (!token) return;
     setLoading(true);
 
-    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const API_BASE = API_BASE_URL;
     fetch(`${API_BASE}/api/assessment/results/history`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -223,7 +224,7 @@ Focus on their strengths and how their personality connects to their top courses
 Do not use bullet points. Do not repeat the numbers verbatim.
 `.trim();
 
-    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const API_BASE = API_BASE_URL;
     fetch(`${API_BASE}/api/ai/profile-summary`, {
       method: "POST",
       headers: {

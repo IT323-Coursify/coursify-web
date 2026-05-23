@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import "../styles/Profile.css";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -289,7 +289,7 @@ function Profile() {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res   = await fetch(`${API}/api/auth/profile`, {
+        const res   = await fetch(`${API_BASE_URL}/api/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -310,7 +310,7 @@ function Profile() {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res   = await fetch(`${API}/api/assessment/results/history`, {
+        const res   = await fetch(`${API_BASE_URL}/api/assessment/results/history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed.");
@@ -325,7 +325,7 @@ function Profile() {
     setSaveError("");
     try {
       const token = localStorage.getItem("token");
-      const res   = await fetch(`${API}/api/auth/profile`, {
+      const res   = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method:  "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({

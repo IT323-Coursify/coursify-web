@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../config/api";
+import API_BASE_URL from "../config/api";
 import logoText from "../assets/logo-text.png";
 import coursifyLogo from "../assets/coursify-logo.png";
 
@@ -88,7 +88,7 @@ export default function AdminOTPVerify() {
 
     try {
       setLoading(true);
-      const res  = await fetch(`${API}/api/auth/admin-verify-otp`, {
+      const res  = await fetch(`${API_BASE_URL}/api/auth/admin-verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -129,7 +129,7 @@ export default function AdminOTPVerify() {
 
     try {
       setResendLoading(true);
-      const res  = await fetch(`${API}/api/auth/admin-resend-otp`, {
+      const res  = await fetch(`$API_BASE_URL/api/auth/admin-resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
