@@ -850,7 +850,7 @@ export default function AdminDashboard() {
     <>
       <style>{CSS}</style>
       <div className="ad-root">
-        <aside className="ad-sidebar">
+        <aside className="ad-sidebar" style={{display:"flex"}}>
           <div className="ad-logo">
             <span className="ad-logo-mark">C</span>
             <span className="ad-logo-text">Coursify</span>
