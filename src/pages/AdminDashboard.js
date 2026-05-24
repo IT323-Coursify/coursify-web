@@ -823,13 +823,21 @@ const TABS = [
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [user]   = useState(()=>JSON.parse(localStorage.getItem("coursify_user")||"{}"));
+  const [authorized, setAuthorized] = useState(false);
   const [tab,setTab]     = useState("users");
   const [range,setRange] = useState("7d");
 
   useEffect(()=>{
     const role = localStorage.getItem("coursify_role");
-    if(!localStorage.getItem("token")||!["admin","superadmin"].includes(role)) navigate("/dashboard");
+    const token = localStorage.getItem("token");
+    if(!token || !["admin","superadmin"].includes(role)) {
+      navigate("/dashboard");
+    } else {
+      setAuthorized(true); // ← only show dashboard if authorized
+    }
   },[navigate]);
+
+  if(!authorized) return null;
 
   const subtitles = {
     users:       "Registration trends and user breakdowns",
