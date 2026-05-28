@@ -6,6 +6,7 @@ The web version supports all three user roles: student, admin, and superadmin. I
 
 ## Features
 Student
+
 • User Authentication — Registration with email OTP verification, login, forgot password with reset code flow, and JWT-based session management
 
 • RIASEC Assessment — Holland Interest Inventory with 36 questions across 6 personality types (Realistic, Investigative, Artistic, Social, Enterprising, Conventional)
@@ -27,9 +28,11 @@ Student
 • Profile Management — Edit username, email, grade level, and academic strand
 
 Admin
+
 • Analytics Dashboard — Platform statistics including total users, new registrations, active/inactive accounts, registration trend chart, strand breakdown, grade                                    level breakdown, and role distribution; filterable by 7-day, 30-day, or all-time range
 
 Superadmin
+
 • User Management — Paginated, searchable, and filterable user table with role assignment and account activation/deactivation
 
 • Audit Log — Timestamped record of all admin-initiated role and status changes
