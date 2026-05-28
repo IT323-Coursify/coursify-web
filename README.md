@@ -82,21 +82,26 @@ All API requests include a Bearer token in the Authorization header. The Protect
 
 ## Installation & Setup
 Prerequisites
+
 •	Node.js v18 or higher
 •	npm or yarn
 •	Coursify backend running locally or deployed (see backend README)
 1. Clone the repository
 git clone https://github.com/yourusername/coursify-web.git
 cd coursify-web
+
 2. Install dependencies
 npm install
+
 3. Configure the API
 Create a .env file in the project root:
 REACT_APP_API_URL=http://localhost:8000
 Replace the value with your deployed backend URL if not running locally.
+
 4. Start the development server
 npm start
 The app will be available at http://localhost:3000/coursify-web
+
 5. Build for production
 npm run build
 The optimized build output will be in the build/ folder, ready for static hosting.
@@ -115,103 +120,13 @@ E: seanfinn830@gmail.com
 P: Genesis1:1
 
 ## Known Limitations
-•	Admin and superadmin roles are web-only — The mobile version of Coursify only supports the student role. Logging in with admin or superadmin credentials on the mobile app will not grant access to any admin features
-•	Email delivery in deployment — OTP verification and password reset emails use Gmail SMTP which requires outbound ports 465 or 587. Most cloud hosting providers block these ports, causing connection timeouts in production. Locally this works fine since the machine can connect directly. The proper solution for production is to replace Gmail SMTP with a dedicated email API service such as SendGrid or Mailgun
-•	Assessment results not editable — Once an assessment is submitted it is permanently stored; there is no way to retake or delete a specific attempt from the UI
-•	No real-time updates — The analytics dashboard and user management table require a manual page refresh to reflect the latest data
+• Admin and superadmin roles are web-only — The mobile version of Coursify only supports the student role. Logging in with admin or superadmin credentials on the mobile app will not grant access to any admin features
 
+• Email delivery in deployment — OTP verification and password reset emails use Gmail SMTP which requires outbound ports 465 or 587. Most cloud hosting providers block these ports, causing connection timeouts in production. Locally this works fine since the machine can connect directly. The proper solution for production is to replace Gmail SMTP with a dedicated email API service such as SendGrid or Mailgun
 
-## Coursify Web
-## Project Description
-Coursify Web is the browser-based frontend of the Coursify platform — a Senior High School course recommendation system. It provides students with a full psychometric assessment experience and personalized ML-powered course recommendations, while also offering dedicated dashboards for admins and superadmins to manage users and monitor platform analytics.
-The web version supports all three user roles: student, admin, and superadmin. It communicates with the shared Coursify FastAPI backend via REST API.
+• Assessment results not editable — Once an assessment is submitted it is permanently stored; there is no way to retake or delete a specific attempt from the UI
 
-## Features
-Student
-•	User Authentication — Registration with email OTP verification, login, forgot password with reset code flow, and JWT-based session management
-•	RIASEC Assessment — Holland Interest Inventory with 36 questions across 6 personality types (Realistic, Investigative, Artistic, Social, Enterprising, Conventional)
-•	Big Five Personality Assessment — OCEAN model profiling with 25 questions across 5 traits including reverse-scored items
-•	Aptitude Assessment — 12-question subject tests across Math, Science, English, and Abstract Reasoning with easy / medium / hard difficulty tiers
-•	ML-Powered Course Recommendations — Top 5 ranked college course suggestions with confidence scores
-•	AI Profile Summary — Google Gemini generates a personalized counselor-style summary based on assessment results
-•	Dashboard — Full assessment profile with RIASEC bar chart, Big Five trait cards, aptitude scores, top recommended courses, and quick stats panel
-•	Assessment History — All past attempts with expandable score breakdowns per attempt (courses, RIASEC, Big Five, aptitude tabs)
-•	Course Explorer — Browse and filter college courses by strand and category
-•	Profile Management — Edit username, email, grade level, and academic strand
-Admin
-•	Analytics Dashboard — Platform statistics including total users, new registrations, active/inactive accounts, registration trend chart, strand breakdown, grade level breakdown, and role distribution; filterable by 7-day, 30-day, or all-time range
-Superadmin
-•	User Management — Paginated, searchable, and filterable user table with role assignment and account activation/deactivation
-•	Audit Log — Timestamped record of all admin-initiated role and status changes
-•	CSV Export — Download all user data as a CSV file
-•	Role-Based Access Control — Three-tier access enforced via protected routes on the frontend
-
-## Technology Stack
-Layer	Technology
-Framework	React.js (Create React App)
-Routing	React Router v6
-Charts	Recharts
-Icons	React Icons
-Local Storage	localStorage
-Styling	Plain CSS (Nunito + Sora fonts via Google Fonts)
-Environment	.env via REACT_APP_* variables
-
-## System Architecture
-Coursify Web (React.js)
-        │
-        │  localStorage
-        │  ┌─────────────────────────────────┐
-        │  │  token, coursify_user,           │
-        │  │  coursify_role, coursify_        │
-        │  │  assessment_progress             │
-        │  └─────────────────────────────────┘
-        │
-        │  Protected Routes
-        │  ┌──────────────────────────────────────────┐
-        │  │  / (Login)                               │
-        │  │  /register                               │
-        │  │  /dashboard              → role: user    │
-        │  │  /assessment             → role: user    │
-        │  │  /courses                → role: user    │
-        │  │  /profile                → role: user    │
-        │  │  /admin/dashboard        → role: admin+  │
-        │  │  /superadmin/dashboard   → role: superadmin│
-        │  └──────────────────────────────────────────┘
-        │
-        │  REST API calls (JWT Bearer token)
-        ▼
-
-
-## Coursify FastAPI Backend
-All API requests include a Bearer token in the Authorization header. The ProtectedRoute component checks coursify_role from localStorage before rendering any route, redirecting unauthorized users to the appropriate fallback.
-
-## Installation & Setup
-Prerequisites
-•	Node.js v18 or higher
-•	npm or yarn
-•	Coursify backend running locally or deployed (see backend README)
-1. Clone the repository
-git clone https://github.com/yourusername/coursify-web.git
-cd coursify-web
-2. Install dependencies
-npm install
-3. Configure the API
-Create a .env file in the project root:
-REACT_APP_API_URL=http://localhost:8000
-Replace the value with your deployed backend URL if not running locally.
-4. Start the development server
-npm start
-The app will be available at http://localhost:3000/coursify-web
-5. Build for production
-npm run build
-The optimized build output will be in the build/ folder, ready for static hosting.
-Note: The basename is set to /coursify-web in the router. If you deploy to a different path or domain root, update the basename prop in App.js accordingly.
-
-## Known Limitations
-•	Admin and superadmin roles are web-only — The mobile version of Coursify only supports the student role. Logging in with admin or superadmin credentials on the mobile app will not grant access to any admin features
-•	Email delivery in deployment — OTP verification and password reset emails use Gmail SMTP which requires outbound ports 465 or 587. Most cloud hosting providers block these ports, causing connection timeouts in production. Locally this works fine since the machine can connect directly. The proper solution for production is to replace Gmail SMTP with a dedicated email API service such as SendGrid or Mailgun
-•	Assessment results not editable — Once an assessment is submitted it is permanently stored; there is no way to retake or delete a specific attempt from the UI
-•	No real-time updates — The analytics dashboard and user management table require a manual page refresh to reflect the latest data
+• No real-time updates — The analytics dashboard and user management table require a manual page refresh to reflect the latest data
 
 
 ## Deployment Links
